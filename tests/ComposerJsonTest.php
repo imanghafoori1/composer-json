@@ -48,29 +48,29 @@ class ComposerJsonTest extends TestCase
             'license' => 'MIT',
             'type' => 'project',
             'require' => [
-                'hello/how' => '~5.0'
+                'hello/how' => '~5.0',
             ],
             'require-dev' => [
-                'phpunit/phpunit' => '~4.0'
+                'phpunit/phpunit' => '~4.0',
             ],
             'autoload' => [
                 'classmap' => [
-                    'database', 'tests/TestCase.php'
+                    'database', 'tests/TestCase.php',
                 ],
                 'psr-4' => [
-                    'App\\' => 'app/'
+                    'App\\' => 'app/',
                 ],
             ],
             'autoload-dev' => [
                 'psr-4' => [
-                    'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests'
+                    'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests',
                 ],
             ],
             'repositories' => [
                 [
                     'type' => 'path',
-                    'url' => './a2'
-                ]
+                    'url' => './a2',
+                ],
             ],
             'extra' => [
                 'some_key' => [

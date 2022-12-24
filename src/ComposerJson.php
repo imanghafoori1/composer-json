@@ -12,6 +12,7 @@ class ComposerJson
      * Used for testing purposes.
      */
     public $basePath = null;
+
     public static function make($basePath)
     {
         $basePath = trim($basePath, '/\\ ');
@@ -21,7 +22,6 @@ class ComposerJson
         } else {
             throw new InvalidArgumentException('The path does not contain a composer.json file.');
         }
-
     }
 
     private function __construct($basePath)
