@@ -1,6 +1,6 @@
 # Composer Json:
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/imanghafoori/composer-json.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/imanghafoori/composer-json.svg?style=flat-square)](https://packagist.org/packages/imanghafoori/composer-json)
 [![Tests](https://img.shields.io/github/actions/workflow/status/imanghafoori/composer-json/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/imanghafoori/composer-json/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/imanghafoori/composer-json.svg?style=flat-square)](https://packagist.org/packages/imanghafoori/composer-json)
 
@@ -19,7 +19,7 @@ composer require imanghafoori/composer-json
 You have to pass the absolute path to the composer.json file to the make method.
 
 ```php
-$composer = 'ImanGhafoori\ComposerJson\ComposerJson::make(__DIR__);
+$composer = \ImanGhafoori\ComposerJson\ComposerJson::make(__DIR__);
 ```
 Then you will have access to a handful of methods.
 
