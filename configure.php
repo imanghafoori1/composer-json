@@ -134,10 +134,12 @@ function setupTestingLibrary(string $testingLibrary): void
             to: __DIR__.'/tests/ExampleTest.php'
         );
 
+        /*
         rename(
             from: __DIR__.'/.github/workflows/run-tests-pest.yml',
             to: __DIR__.'/.github/workflows/run-tests.yml'
         );
+        */
 
         replace_in_file(__DIR__.'/composer.json', [
             ':require_dev_testing' => '"pestphp/pest": "^1.20"',

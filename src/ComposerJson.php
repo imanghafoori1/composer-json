@@ -12,16 +12,16 @@ class ComposerJson
      * Used for testing purposes.
      */
     public $basePath = null;
-    public static function make($basePath)
-    {
-        $basePath = trim($basePath, '/\\ ');
-        $basePath = str_replace('/\\', DIRECTORY_SEPARATOR, $basePath);
-        if (file_exists($basePath.DIRECTORY_SEPARATOR.'composer.json')) {
-            return new static($basePath);
-        } else {
-            throw new InvalidArgumentException('The path does not contain a composer.json file.');
-        }
 
+    public static function make($folderPath)
+    {
+        $folderPath = rtrim($folderPath, '/\\ ');
+        $folderPath = str_replace('/\\', DIRECTORY_SEPARATOR, $folderPath);
+        if (file_exists($folderPath.DIRECTORY_SEPARATOR.'composer.json')) {
+            return new static($folderPath);
+        } else {
+            throw new InvalidArgumentException('The path ('.$folderPath.') does not contain a composer.json file.');
+        }
     }
 
     private function __construct($basePath)
