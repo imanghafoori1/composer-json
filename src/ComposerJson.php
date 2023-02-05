@@ -140,7 +140,7 @@ class ComposerJson
     /**
      * Checks all the psr-4 loaded classes to have correct namespace.
      *
-     * @param    $autoloads
+     * @param  array  $autoloads
      * @return array
      */
     public static function purgeAutoloadShortcuts($autoloads)
@@ -163,5 +163,16 @@ class ComposerJson
         }
 
         return $map;
+    }
+
+    public static function startsWith($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
