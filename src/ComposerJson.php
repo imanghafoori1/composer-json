@@ -29,7 +29,7 @@ class ComposerJson
         $this->basePath = $basePath;
     }
 
-    public function readAutoload()
+    public function readAutoload($purgeShortcuts = false)
     {
         $result = [];
 
@@ -41,7 +41,7 @@ class ComposerJson
         // add the root composer.json
         $result['/'] = $this->readKey('autoload.psr-4') + $this->readKey('autoload-dev.psr-4');
 
-        return $result;
+        return $purgeShortcuts ? self::purgeAutoloadShortcuts($result) : $result;
     }
 
     public function collectLocalRepos()
@@ -135,5 +135,33 @@ class ComposerJson
         }
 
         return $target;
+    }
+
+    /**
+     * Checks all the psr-4 loaded classes to have correct namespace.
+     *
+     * @param  $autoloads
+     * @return array
+     */
+    public static function purgeAutoloadShortcuts($autoloads)
+    {
+        $scannedPaths = [];
+        $map = [];
+        foreach ($autoloads as $path => $autoload) {
+            foreach ($autoload as $namespace => $psr4Path) {
+                // To avoid duplicate scanning:
+                foreach ($scannedPaths as $scannedPath) {
+                    if (strlen($psr4Path) > strlen($scannedPath) && self::startsWith($psr4Path, $scannedPath)) {
+                        continue 2;
+                    }
+                }
+
+                $scannedPaths[] = $psr4Path;
+
+                $map[$path][$namespace] = $psr4Path;
+            }
+        }
+
+        return $map;
     }
 }
