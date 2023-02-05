@@ -140,7 +140,7 @@ class ComposerJson
     /**
      * Checks all the psr-4 loaded classes to have correct namespace.
      *
-     * @param  $autoloads
+     * @param    $autoloads
      * @return array
      */
     public static function purgeAutoloadShortcuts($autoloads)
