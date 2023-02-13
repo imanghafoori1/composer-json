@@ -44,6 +44,21 @@ class ComposerJson
         return $purgeShortcuts ? self::purgeAutoloadShortcuts($result) : $result;
     }
 
+    public function readAutoloadFiles()
+    {
+        $result = [];
+        $repos = $this->collectLocalRepos();
+        $repos[] = '/';
+
+        foreach ($repos as $relativePath) {
+            // We avoid autoload-dev for repositories.
+            $result[$relativePath]['autoload'] = $this->readKey('autoload.files', $relativePath);
+            $result[$relativePath]['autoload-dev'] = $this->readKey('autoload-dev.files', $relativePath);
+        }
+
+        return $result;
+    }
+
     public function collectLocalRepos()
     {
         $composers = [];

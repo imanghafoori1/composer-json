@@ -15,6 +15,7 @@
             "database",
             "tests/TestCase.php"
         ],
+        "files": ["src/MyLibrary/functions.php"],
         "psr-4": {
             "G2\\": "ref",
             "App2\\": "app2"

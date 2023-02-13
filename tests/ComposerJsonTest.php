@@ -30,6 +30,33 @@ class ComposerJsonTest extends TestCase
     }
 
     /** @test */
+    public function read_autoload_files()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs');
+
+        $expected = [
+            'a2' => [
+                'autoload' => ['src/MyLibrary/functions.php'],
+                'autoload-dev' => [],
+            ],
+            '/' => [
+                'autoload' => [
+                    'src/MyLib/functions.php',
+                    'src/MyLib/functions2.php',
+                ],
+                'autoload-dev' => [
+                    'src/MyLib/functions.php',
+                    'src/MyLib/functions2.php',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $reader->readAutoloadFiles());
+
+        $this->assertEquals('iman/ghafoori', $reader->readKey('name'));
+    }
+
+    /** @test */
     public function expects_real_paths()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -60,10 +87,18 @@ class ComposerJsonTest extends TestCase
                 'psr-4' => [
                     'App\\' => 'app/',
                 ],
+                'files' => [
+                    'src/MyLib/functions.php',
+                    'src/MyLib/functions2.php',
+                ],
             ],
             'autoload-dev' => [
                 'psr-4' => [
                     'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests',
+                ],
+                'files' => [
+                    'src/MyLib/functions.php',
+                    'src/MyLib/functions2.php',
                 ],
             ],
             'repositories' => [
