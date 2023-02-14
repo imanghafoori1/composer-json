@@ -8,7 +8,19 @@ use PHPUnit\Framework\TestCase;
 class ComposerJsonTest extends TestCase
 {
     /** @test */
-    public function read_autoload()
+    public function read_autoload_psr4_purged()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
+        $this->assertEquals([
+            "/" => [
+                'App\\' => 'app/',
+                'Tests\\' => 'tests/'
+            ],
+        ], $reader->readAutoload(true));
+    }
+
+    /** @test */
+    public function read_autoload_psr4()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
 
@@ -20,13 +32,21 @@ class ComposerJsonTest extends TestCase
             ],
             '/' => [
                 'App\\' => 'app/',
-                'Imanghafoori\LaravelMicroscope\Tests\\' => 'tests/',
+                'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests/',
             ],
         ];
 
         $this->assertEquals($expected, $reader->readAutoload());
+    }
 
+    /** @test */
+    public function readKey()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs');
         $this->assertEquals('iman/ghafoori', $reader->readKey('name'));
+        $this->assertEquals(['hello/how' => '~5.0'], $reader->readKey('require'));
+        $this->assertEquals('~5.0', $reader->readKey('require.hello/how'));
+        $this->assertEquals(['framework', 'package'], $reader->readKey('keywords'));
     }
 
     /** @test */
@@ -62,7 +82,14 @@ class ComposerJsonTest extends TestCase
     }
 
     /** @test */
-    public function read_file()
+    public function expects_composer_json_file_to_exist()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        ComposerJson::make(__DIR__.'/Stubs/empty');
+    }
+
+    /** @test */
+    public function readComposerFileData()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
         $actual = $reader->readComposerFileData();

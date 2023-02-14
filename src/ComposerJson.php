@@ -160,27 +160,20 @@ class ComposerJson
      */
     public static function purgeAutoloadShortcuts($autoloads)
     {
-        $scannedPaths = [];
-        $map = [];
-        foreach ($autoloads as $path => $autoload) {
-            foreach ($autoload as $namespace => $psr4Path) {
-                // To avoid duplicate scanning:
-                foreach ($scannedPaths as $scannedPath) {
-                    if (strlen($psr4Path) > strlen($scannedPath) && self::startsWith($psr4Path, $scannedPath)) {
-                        continue 2;
+        foreach ($autoloads as $composerPath => $psr4Mappings) {
+            foreach ($psr4Mappings as $namespace1 => $psr4Path1) {
+                foreach ($psr4Mappings as $psr4Path2) {
+                    if (strlen($psr4Path1) > strlen($psr4Path2) && self::startsWith($psr4Path1, $psr4Path2)) {
+                        unset($autoloads[$composerPath][$namespace1]);
                     }
                 }
-
-                $scannedPaths[] = $psr4Path;
-
-                $map[$path][$namespace] = $psr4Path;
             }
         }
 
-        return $map;
+        return $autoloads;
     }
 
-    public static function startsWith($haystack, $needles)
+    private static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
