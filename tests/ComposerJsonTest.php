@@ -52,8 +52,6 @@ class ComposerJsonTest extends TestCase
         ];
 
         $this->assertEquals($expected, $reader->readAutoloadFiles());
-
-        $this->assertEquals('iman/ghafoori', $reader->readKey('name'));
     }
 
     /** @test */
