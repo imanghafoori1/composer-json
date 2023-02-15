@@ -14,7 +14,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals([
             "/" => [
                 'App\\' => 'app/',
-                'Tests\\' => 'tests/'
+                'Tests\\' => 'tests/',
             ],
         ], $reader->readAutoload(true));
     }

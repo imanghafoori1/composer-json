@@ -58,7 +58,7 @@ class NamespaceCalculatorTest extends TestCase
         $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName);
         $this->assertEquals([
             'type' => 'namespace',
-            'correctNamespace' => 'Models'
+            'correctNamespace' => 'Models',
         ], $result);
     }
 }
