@@ -8,6 +8,57 @@ use PHPUnit\Framework\TestCase;
 class ComposerJsonTest extends TestCase
 {
     /** @test */
+    public function getRelativePathFromNamespace()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
+        $relativePath = $reader->getRelativePathFromNamespace('App\\App\\Models\\Tests\\User');
+        $ns = DIRECTORY_SEPARATOR;
+        $this->assertEquals('app'.$ns.'App'.$ns.'Models'.$ns.'Tests'.$ns.'User', $relativePath);
+
+        $relativePath = $reader->getRelativePathFromNamespace('Models\\Koo\\User');
+        $this->assertEquals('app'.$ns.'Models'.$ns.'Koo'.$ns.'User', $relativePath);
+
+        $relativePath = $reader->getRelativePathFromNamespace('Tests\\User');
+        $this->assertEquals('tests'.$ns.'User', $relativePath);
+
+        $reader = ComposerJson::make(__DIR__.'/Stubs');
+        $relativePath = $reader->getRelativePathFromNamespace('App2\\Models\\Tests\\User');
+        $this->assertEquals('a2'.$ns.'app2'.$ns.'Models'.$ns.'Tests'.$ns.'User', $relativePath);
+
+        $reader = ComposerJson::make(__DIR__.'/Stubs');
+        $relativePath = $reader->getRelativePathFromNamespace('Map\\Tests\\User');
+        $this->assertEquals('m1'.$ns.'Tests'.$ns.'User', $relativePath);
+
+        $reader = ComposerJson::make(__DIR__.'/Stubs');
+        $relativePath = $reader->getRelativePathFromNamespace('Dapp\\Tests\\User');
+        $this->assertEquals('dapp'.$ns.'Tests'.$ns.'User', $relativePath);
+    }
+
+    /** @test */
+    public function getNamespacedClassFromPath()
+    {
+        $reader = ComposerJson::make($p = __DIR__.'/Stubs/shortcut_namespace');
+        $namespace = $reader->getNamespacedClassFromPath($p.'/app/G1/G2.php');
+        $this->assertEquals('App\G1\G2', $namespace);
+
+        $namespace = $reader->getNamespacedClassFromPath($p.'/app/Models/G1/G2.php');
+        $this->assertEquals('Models\G1\G2', $namespace);
+
+        $reader = ComposerJson::make($p = __DIR__.'/Stubs');
+        $namespace = $reader->getNamespacedClassFromPath($p.'/m1/G1/G2.php');
+        $this->assertEquals('Map\G1\G2', $namespace);
+
+        $namespace = $reader->getNamespacedClassFromPath($p.'/m2/G1/G2.php');
+        $this->assertEquals('Map\G1\G2', $namespace);
+
+        $namespace = $reader->getNamespacedClassFromPath($p.'/dapp/dapp/G1/G2.php');
+        $this->assertEquals('Dapp\dapp\G1\G2', $namespace);
+
+        $namespace = $reader->getNamespacedClassFromPath($p.'/a2/ref/ref/G2.php');
+        $this->assertEquals('G2\ref\G2', $namespace);
+    }
+
+    /** @test */
     public function read_autoload_psr4_purged()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
@@ -33,6 +84,8 @@ class ComposerJsonTest extends TestCase
             '/' => [
                 'App\\' => 'app/',
                 'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests/',
+                'Dapp\\' => 'dapp/', // <==== is normalized
+                'Map\\' => ['m1/', 'm2/']
             ],
         ];
 
@@ -111,6 +164,8 @@ class ComposerJsonTest extends TestCase
                 ],
                 'psr-4' => [
                     'App\\' => 'app/',
+                    'Dapp\\' => 'dapp',
+                    'Map\\' => ['m1/', 'm2/']
                 ],
                 'files' => [
                     'src/MyLib/functions.php',

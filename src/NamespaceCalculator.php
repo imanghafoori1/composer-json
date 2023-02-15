@@ -44,6 +44,19 @@ class NamespaceCalculator
         }
     }
 
+    public static function getNamespaceFromFullClass($class)
+    {
+        $segments = explode('\\', $class);
+        array_pop($segments); // removes the last part
+
+        return trim(implode('\\', $segments), '\\');
+    }
+
+    public static function haveSameNamespace($class1, $class2)
+    {
+        return self::getNamespaceFromFullClass($class1) === self::getNamespaceFromFullClass($class2);
+    }
+
     private static function replaceFirst($search, $replace, $subject)
     {
         if ($search == '') {

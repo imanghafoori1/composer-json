@@ -17,7 +17,9 @@
             "tests/TestCase.php"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Dapp\\": "dapp",
+            "Map\\": ["m1/", "m2/"]
         }
     },
     "autoload-dev": {

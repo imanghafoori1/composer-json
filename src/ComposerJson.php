@@ -51,7 +51,6 @@ class ComposerJson
         $repos[] = '/';
 
         foreach ($repos as $relativePath) {
-            // We avoid autoload-dev for repositories.
             $result[$relativePath]['autoload'] = $this->readKey('autoload.files', $relativePath);
             $result[$relativePath]['autoload-dev'] = $this->readKey('autoload-dev.files', $relativePath);
         }
@@ -64,11 +63,12 @@ class ComposerJson
         $composers = [];
 
         foreach ($this->readKey('repositories') as $repo) {
-            if (! isset($repo['type']) || $repo['type'] !== 'path') {
+            if (($repo['type'] ?? '') !== 'path') {
                 continue;
             }
 
-            $dirPath = \trim(\trim($repo['url'], '.'), '/\\');
+            $dirPath = ltrim($repo['url'], '.\\/');
+
             $path = $this->basePath.DIRECTORY_SEPARATOR.$dirPath.DIRECTORY_SEPARATOR.'composer.json';
             // sometimes php can not detect relative paths, so we use the absolute path here.
             if (file_exists($path)) {
@@ -77,22 +77,6 @@ class ComposerJson
         }
 
         return $composers;
-    }
-
-    private function normalizePaths($value, $path)
-    {
-        $path && $path = $this->finish($path, '/');
-        foreach ($value as $namespace => $_path) {
-            if (is_array($_path)) {
-                foreach ($_path as $i => $p) {
-                    $value[$namespace][$i] = str_replace('//', '/', $path.$this->finish($p, '/'));
-                }
-            } else {
-                $value[$namespace] = str_replace('//', '/', $path.$this->finish($_path, '/'));
-            }
-        }
-
-        return $value;
     }
 
     public function readKey($key, $composerPath = '')
@@ -128,30 +112,6 @@ class ComposerJson
         return $this->result[$absPath];
     }
 
-    public function finish($value, $cap)
-    {
-        $quoted = preg_quote($cap, '/');
-
-        return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
-    }
-
-    public function data_get($target, $key, $default = null)
-    {
-        $key = is_array($key) ? $key : explode('.', $key);
-
-        foreach ($key as $i => $segment) {
-            unset($key[$i]);
-
-            if (! array_key_exists($segment, $target)) {
-                return $default;
-            }
-
-            $target = $target[$segment];
-        }
-
-        return $target;
-    }
-
     /**
      * Checks all the psr-4 loaded classes to have correct namespace.
      *
@@ -182,5 +142,113 @@ class ComposerJson
         }
 
         return false;
+    }
+
+    public function getRelativePathFromNamespace($namespace)
+    {
+        $autoload = $this->readAutoload();
+        [$namespaces, $paths] = self::getSortedAutoload($autoload);
+        [$namespaces, $paths] = self::flatten($paths, $namespaces);
+        $path = '';
+        foreach ($namespaces as $i => $ns) {
+            if (0 === strpos($namespace, $ns)) {
+                $path = \substr_replace($namespace, $paths[$i], 0, strlen($ns));
+                break;
+            }
+        }
+
+        return \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
+    }
+
+    public function getNamespacedClassFromPath($absPath)
+    {
+        $autoload = $this->readAutoload();
+        [$namespaces, $paths] = self::getSortedAutoload($autoload);
+
+        // Remove .php from class path
+        $relPath = str_replace([$this->basePath, '.php'], '', $absPath);
+        $relPath = trim(str_replace('\\', '/', $relPath), '/');
+
+        [$_namespaces, $_paths] = self::flatten($paths, $namespaces);
+
+        $path = '';
+
+        foreach ($_paths as $i => $p) {
+            if (0 === strpos($relPath, $p)) {
+                $path = \substr_replace($relPath, $_namespaces[$i], 0, strlen($p));
+                break;
+            }
+        }
+
+        return trim(\str_replace('/', '\\', $path), '\\');
+    }
+
+    private static function getSortedAutoload($autoloads)
+    {
+        $namespaces = [];
+        $paths = [];
+
+        foreach ($autoloads as $autoload) {
+            $namespaces = array_merge($namespaces, array_keys($autoload));
+            $paths = array_merge($paths, array_values($autoload));
+        }
+
+        return [$namespaces, $paths];
+    }
+
+    private static function flatten($paths, $namespaces)
+    {
+        $_namespaces = [];
+        $_paths = [];
+        $counter = 0;
+        foreach ($paths as $k => $_p) {
+            foreach ((array) $_p as $p) {
+                $counter++;
+                $_namespaces[$counter] = $namespaces[$k];
+                $_paths[$counter] = $p;
+            }
+        }
+
+        return [$_namespaces, $_paths];
+    }
+
+    private function finish($value, $cap)
+    {
+        $quoted = preg_quote($cap, '/');
+
+        return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
+    }
+
+    private function data_get($target, $key, $default = null)
+    {
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+
+            if (! array_key_exists($segment, $target)) {
+                return $default;
+            }
+
+            $target = $target[$segment];
+        }
+
+        return $target;
+    }
+
+    private function normalizePaths($value, $path)
+    {
+        $path && $path = $this->finish($path, '/');
+        foreach ($value as $namespace => $_path) {
+            if (is_array($_path)) {
+                foreach ($_path as $i => $p) {
+                    $value[$namespace][$i] = str_replace('//', '/', $path.$this->finish($p, '/'));
+                }
+            } else {
+                $value[$namespace] = str_replace('//', '/', $path.$this->finish($_path, '/'));
+            }
+        }
+
+        return $value;
     }
 }
