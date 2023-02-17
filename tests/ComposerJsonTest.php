@@ -85,7 +85,7 @@ class ComposerJsonTest extends TestCase
                 'App\\' => 'app/',
                 'Imanghafoori\\LaravelMicroscope\\Tests\\' => 'tests/',
                 'Dapp\\' => 'dapp/', // <==== is normalized
-                'Map\\' => ['m1/', 'm2/']
+                'Map\\' => ['m1/', 'm2/'],
             ],
         ];
 
@@ -165,7 +165,7 @@ class ComposerJsonTest extends TestCase
                 'psr-4' => [
                     'App\\' => 'app/',
                     'Dapp\\' => 'dapp',
-                    'Map\\' => ['m1/', 'm2/']
+                    'Map\\' => ['m1/', 'm2/'],
                 ],
                 'files' => [
                     'src/MyLib/functions.php',

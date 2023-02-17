@@ -153,6 +153,7 @@ class ComposerJson
         foreach ($namespaces as $i => $ns) {
             if (0 === strpos($namespace, $ns)) {
                 $path = \substr_replace($namespace, $paths[$i], 0, strlen($ns));
+
                 break;
             }
         }
@@ -176,6 +177,7 @@ class ComposerJson
         foreach ($_paths as $i => $p) {
             if (0 === strpos($relPath, $p)) {
                 $path = \substr_replace($relPath, $_namespaces[$i], 0, strlen($p));
+
                 break;
             }
         }
