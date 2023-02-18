@@ -163,26 +163,22 @@ class ComposerJson
 
     public function getNamespacedClassFromPath($absPath)
     {
-        $autoload = $this->readAutoload();
-        [$namespaces, $paths] = self::getSortedAutoload($autoload);
+        $psr4Mappings = $this->readAutoload();
+        // Converts "absolute path" to "relative path":
+        $relativePath = trim(str_replace($this->basePath, '', $absPath), '/\\');
+        $className = str_replace('.php', '', basename($absPath));
 
-        // Remove .php from class path
-        $relPath = str_replace([$this->basePath, '.php'], '', $absPath);
-        $relPath = trim(str_replace('\\', '/', $relPath), '/');
+        foreach ($psr4Mappings as $composerPath => $psr4Mapping) {
+            if (0 === strpos($relativePath, $composerPath)) {
+                $correctNamespaces = NamespaceCalculator::getCorrectNamespaces($psr4Mapping, $relativePath);
 
-        [$_namespaces, $_paths] = self::flatten($paths, $namespaces);
-
-        $path = '';
-
-        foreach ($_paths as $i => $p) {
-            if (0 === strpos($relPath, $p)) {
-                $path = \substr_replace($relPath, $_namespaces[$i], 0, strlen($p));
-
-                break;
+                return NamespaceCalculator::findShortest($correctNamespaces).'\\'.$className;
             }
         }
 
-        return trim(\str_replace('/', '\\', $path), '\\');
+        $correctNamespaces = NamespaceCalculator::getCorrectNamespaces($psr4Mappings['/'], $relativePath);
+
+        return NamespaceCalculator::findShortest($correctNamespaces).'\\'.$className;
     }
 
     private static function getSortedAutoload($autoloads)

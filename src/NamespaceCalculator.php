@@ -57,6 +57,31 @@ class NamespaceCalculator
         return self::getNamespaceFromFullClass($class1) === self::getNamespaceFromFullClass($class2);
     }
 
+    public static function findShortest($correctNamespaces)
+    {
+        // finds the shortest namespace
+        return array_reduce($correctNamespaces, function ($a, $b) {
+            return ($a === null || strlen($a) >= strlen($b)) ? $b : $a;
+        });
+    }
+
+    public static function getCorrectNamespaces($psr4Mapping, $relativePath)
+    {
+        $correctNamespaces = [];
+        $relativePath = str_replace(['\\', '.php'], ['/', ''], $relativePath);
+        foreach ($psr4Mapping as $namespacePrefix => $paths) {
+            foreach ((array) $paths as $path) {
+                if (0 === strpos($relativePath, $path)) {
+                    $correctNamespace = substr_replace($relativePath, $namespacePrefix, 0, strlen($path));
+                    $correctNamespace = str_replace('/', '\\', $correctNamespace);
+                    $correctNamespaces[] = self::getNamespaceFromFullClass($correctNamespace);
+                }
+            }
+        }
+
+        return $correctNamespaces;
+    }
+
     private static function replaceFirst($search, $replace, $subject)
     {
         if ($search == '') {
@@ -70,29 +95,5 @@ class NamespaceCalculator
         }
 
         return $subject;
-    }
-
-    private static function findShortest($correctNamespaces)
-    {
-        // finds the shortest namespace
-        return array_reduce($correctNamespaces, function ($a, $b) {
-            if ($a === null) {
-                return $b;
-            }
-
-            return strlen($a) < strlen($b) ? $a : $b;
-        });
-    }
-
-    private static function getCorrectNamespaces($psr4Mapping, $relativePath)
-    {
-        $correctNamespaces = [];
-        foreach ($psr4Mapping as $namespacePrefix => $path) {
-            if (substr(str_replace('\\', '/', $relativePath), 0, strlen($path)) === $path) {
-                $correctNamespaces[] = self::calculateCorrectNamespace($relativePath, $path, $namespacePrefix);
-            }
-        }
-
-        return $correctNamespaces;
     }
 }

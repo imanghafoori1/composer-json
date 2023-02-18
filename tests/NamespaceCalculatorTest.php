@@ -8,6 +8,17 @@ use PHPUnit\Framework\TestCase;
 class NamespaceCalculatorTest extends TestCase
 {
     /** @test */
+    public function can_extract_namespace()
+    {
+        $namespaces = 'Imanghafoori\LaravelMicroscope\Analyzers';
+        $_className = "Imanghafoori\LaravelMicroscope\Analyzers\NamespaceCorrector";
+
+        $this->assertEquals($namespaces, NamespaceCalculator::getNamespaceFromFullClass($_className));
+        $this->assertEquals('', NamespaceCalculator::getNamespaceFromFullClass('A'));
+        $this->assertEquals('B', NamespaceCalculator::getNamespaceFromFullClass('B\A'));
+    }
+
+    /** @test */
     public function calculate_correct_namespace()
     {
         $ds = DIRECTORY_SEPARATOR;
@@ -60,5 +71,20 @@ class NamespaceCalculatorTest extends TestCase
             'type' => 'namespace',
             'correctNamespace' => 'Models',
         ], $result);
+    }
+
+    /** @test */
+    public function can_detect_same_namespaces()
+    {
+        $class1 = "Imanghafoori\LaravelMicroscope\Analyzers\Iman";
+        $class2 = "Imanghafoori\LaravelMicroscope\Analyzers\Ghafoori";
+        $class3 = "Imanghafoori\LaravelMicroscope\Analyzers\Hello\Ghafoori";
+
+        $this->assertEquals(true, NamespaceCalculator::haveSameNamespace('A', 'A'));
+        $this->assertEquals(true, NamespaceCalculator::haveSameNamespace('A', 'B'));
+        $this->assertEquals(true, NamespaceCalculator::haveSameNamespace($class1, $class2));
+        $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1, $class3));
+        $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1.'.php', $class3.'.php'));
+        $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1, 'Faalse'));
     }
 }

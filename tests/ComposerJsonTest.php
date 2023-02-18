@@ -93,6 +93,26 @@ class ComposerJsonTest extends TestCase
     }
 
     /** @test */
+    public function get_namespace_from_relative_path()
+    {
+        $reader = ComposerJson::make($p = __DIR__.'/Stubs/a3');
+        $result = $reader->getNamespacedClassFromPath('app/Hello.php');
+        $this->assertEquals('App\\Hello', $result);
+
+        $result = $reader->getNamespacedClassFromPath('app/appollo.php');
+        $this->assertEquals('App\\appollo', $result);
+
+        $result = $reader->getNamespacedClassFromPath('app/Models/Hello.php');
+        $this->assertEquals('Models\\Hello', $result);
+
+        $result = $reader->getNamespacedClassFromPath('app/appollo.php');
+        $this->assertEquals('App\\appollo', $result);
+
+        $result = $reader->getNamespacedClassFromPath('app/d/appollo.php');
+        $this->assertEquals('Test\\appollo', $result);
+    }
+
+    /** @test */
     public function readKey()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
