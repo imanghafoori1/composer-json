@@ -63,7 +63,7 @@ class ComposerJsonTest extends TestCase
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
         $this->assertEquals([
-            "/" => [
+            '/' => [
                 'App\\' => 'app/',
                 'Tests\\' => 'tests/',
             ],
