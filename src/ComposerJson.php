@@ -3,30 +3,36 @@
 namespace ImanGhafoori\ComposerJson;
 
 use InvalidArgumentException;
+use Symfony\Component\Finder\Finder;
 
 class ComposerJson
 {
     private $result = [];
+
+    public static $buffer = 800;
 
     /**
      * Used for testing purposes.
      */
     public $basePath = null;
 
-    public static function make($folderPath)
+    public $ignoredNamespaces = [];
+
+    public static function make($folderPath, $ignoredNamespaces = [])
     {
         $folderPath = rtrim($folderPath, '/\\ ');
         $folderPath = str_replace('/\\', DIRECTORY_SEPARATOR, $folderPath);
         if (file_exists($folderPath.DIRECTORY_SEPARATOR.'composer.json')) {
-            return new static($folderPath);
+            return new static($folderPath, $ignoredNamespaces);
         } else {
             throw new InvalidArgumentException('The path ('.$folderPath.') does not contain a composer.json file.');
         }
     }
 
-    private function __construct($basePath)
+    private function __construct($basePath, $ignoredNamespaces)
     {
         $this->basePath = $basePath;
+        $this->ignoredNamespaces = $ignoredNamespaces;
     }
 
     public function readAutoload($purgeShortcuts = false)
@@ -41,7 +47,9 @@ class ComposerJson
         // add the root composer.json
         $result['/'] = $this->readKey('autoload.psr-4') + $this->readKey('autoload-dev.psr-4');
 
-        return $purgeShortcuts ? self::purgeAutoloadShortcuts($result) : $result;
+        $results = $purgeShortcuts ? self::purgeAutoloadShortcuts($result) : $result;
+
+        return self::removedIgnored($results, $this->ignoredNamespaces);
     }
 
     public function readAutoloadFiles()
@@ -112,6 +120,60 @@ class ComposerJson
         return $this->result[$absPath];
     }
 
+    public function getClasslists(?\Closure $filter, ?\Closure $pathFilter)
+    {
+        $classLists = [];
+
+        foreach ($this->readAutoload(true) as $composerFilePath => $autoload) {
+            foreach ($autoload as $namespace => $psr4Path) {
+                $classLists[$composerFilePath][$namespace] = $this->getClassesWithin($psr4Path, $filter, $pathFilter);
+            }
+        }
+
+        return $classLists;
+    }
+
+    public function getClassesWithin($composerPath, \Closure $filterClass, ?\Closure $pathFilter = null)
+    {
+        $results = [];
+        foreach ($this->getAllPhpFiles($composerPath) as $classFilePath) {
+            $absFilePath = $classFilePath->getRealPath();
+
+            if ($pathFilter && ! $pathFilter($absFilePath, $classFilePath->getFilename())) {
+                continue;
+            }
+
+            // Exclude blade files
+            if (substr_count($classFilePath->getFilename(), '.') !== 1) {
+                continue;
+            }
+
+            [$currentNamespace, $class, $parent, $type] = $this->readClass($absFilePath);
+
+            // Skip if there is no class/trait/interface definition found.
+            // For example a route file or a config file.
+            if (! $class) {
+                continue;
+            }
+
+            if ($filterClass($classFilePath, $currentNamespace, $class, $parent) === false) {
+                continue;
+            }
+
+            $results[] = [
+                'relativePath' => $classFilePath->getRelativePath(),
+                'relativePathname' => $classFilePath->getRelativePathname(),
+                'fileName' => $classFilePath->getFilename(),
+                'currentNamespace' => $currentNamespace,
+                'absFilePath' => $absFilePath,
+                'class' => $class,
+                'type' => $type,
+            ];
+        }
+
+        return $results;
+    }
+
     /**
      * Checks all the psr-4 loaded classes to have correct namespace.
      *
@@ -133,15 +195,15 @@ class ComposerJson
         return $autoloads;
     }
 
-    private static function startsWith($haystack, $needles)
+    public function getErrorsLists(array $classLists, ?\Closure $onCheck)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
-                return true;
-            }
+        $errorsLists = [];
+        $autoloads = $this->readAutoload();
+        foreach ($classLists as $composerPath => $classList) {
+            $errorsLists[$composerPath] = NamespaceCalculator::findPsr4Errors($this->basePath, $autoloads[$composerPath], $classList, $onCheck);
         }
 
-        return false;
+        return $errorsLists;
     }
 
     public function getRelativePathFromNamespace($namespace)
@@ -179,6 +241,56 @@ class ComposerJson
         $correctNamespaces = NamespaceCalculator::getCorrectNamespaces($psr4Mappings['/'], $relativePath);
 
         return NamespaceCalculator::findShortest($correctNamespaces).'\\'.$className;
+    }
+
+    /**
+     * get all ".php" files in directory by giving a path.
+     *
+     * @param  string  $path  Directory path
+     * @return \Symfony\Component\Finder\Finder
+     */
+    public function getAllPhpFiles($path, $basePath = '')
+    {
+        if ($basePath === '') {
+            $basePath = $this->basePath;
+        }
+
+        $basePath = rtrim($basePath, '/\\');
+        $path = ltrim($path, '/\\');
+        $path = $basePath.DIRECTORY_SEPARATOR.$path;
+
+        try {
+            return Finder::create()->files()->name('*.php')->in($path);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    private function readClass($absFilePath)
+    {
+        $buffer = self::$buffer;
+        do {
+            [
+                $currentNamespace,
+                $class,
+                $type,
+                $parent,
+            ] = GetClassProperties::fromFilePath($absFilePath, $buffer);
+            $buffer = $buffer + 1000;
+        } while ($currentNamespace && ! $class && $buffer < 6000);
+
+        return [$currentNamespace, $class, $parent, $type];
+    }
+
+    private static function startsWith($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function getSortedAutoload($autoloads)
@@ -248,5 +360,20 @@ class ComposerJson
         }
 
         return $value;
+    }
+
+    private static function removedIgnored($mapping, $ignored = [])
+    {
+        $result = [];
+
+        foreach ($mapping as $i => $map) {
+            foreach ($map as $namespace => $path) {
+                if (! in_array($namespace, $ignored)) {
+                    $result[$i][$namespace] = $path;
+                }
+            }
+        }
+
+        return $result;
     }
 }
