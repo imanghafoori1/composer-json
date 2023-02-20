@@ -48,6 +48,7 @@ class GetClassProperties
 
                 $type = $tokens[$i][0];
                 $i = $i + 2;
+
                 continue;
             }
 
@@ -101,6 +102,7 @@ class GetClassProperties
             if (($tokens[$i][0] == $separator)) {
                 $results .= '|';
                 $i++;
+
                 continue;
             }
 
