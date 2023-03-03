@@ -28,7 +28,7 @@ class GetClassProperties
 
         for ($i = 1; $i < $allTokensCount; $i++) {
             if (! $namespace) {
-                [$i, $namespace,] = self::collectAfterKeyword($tokens, $i, T_NAMESPACE);
+                [$i, $namespace] = self::collectAfterKeyword($tokens, $i, T_NAMESPACE);
             }
 
             // if we reach a double colon before a class keyword
@@ -71,12 +71,10 @@ class GetClassProperties
     }
 
     /**
-     * @param $tokens
      * @param  int  $i
      * @param  int  $target
      * @param  array  $terminators
      * @param  string|null  $separator
-     *
      * @return array
      */
     protected static function collectAfterKeyword($tokens, $i, $target, $terminators = [], $separator = null)
