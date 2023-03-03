@@ -35,6 +35,24 @@ class ComposerJson
         $this->ignoredNamespaces = $ignoredNamespaces;
     }
 
+    public function readAutoloadClassMap()
+    {
+        $result = [];
+
+        foreach ($this->collectLocalRepos() as $relativePath) {
+            $result[$relativePath] = $this->readKey('autoload.classmap', $relativePath) + $this->readKey('autoload-dev.classmap', $relativePath);
+        }
+
+        $result['/'] = $this->readKey('autoload.classmap') + $this->readKey('autoload-dev.classmap');
+
+        return $result;
+    }
+
+    public function readAutoloadPsr4($purgeShortcuts = false)
+    {
+        return $this->readAutoload($purgeShortcuts);
+    }
+
     public function readAutoload($purgeShortcuts = false)
     {
         $result = [];
