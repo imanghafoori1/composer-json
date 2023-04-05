@@ -18,14 +18,30 @@ class ComposerJson
 
     public $ignoredNamespaces = [];
 
-    public static function make($folderPath, $ignoredNamespaces = [])
+    public $additionalComposerJsons = [];
+
+    public static function make($folderPath, $ignoredNamespaces = [], $composers = [])
     {
         $folderPath = rtrim($folderPath, '/\\ ');
-        $folderPath = str_replace('/\\', DIRECTORY_SEPARATOR, $folderPath);
+        $folderPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $folderPath);
         if (file_exists($folderPath.DIRECTORY_SEPARATOR.'composer.json')) {
-            return new static($folderPath, $ignoredNamespaces);
+            $object = new static($folderPath, $ignoredNamespaces);
+            $object->additionalComposerFiles($composers);
+
+            return $object;
         } else {
             throw new InvalidArgumentException('The path ('.$folderPath.') does not contain a composer.json file.');
+        }
+    }
+
+    public function additionalComposerFiles($files)
+    {
+        foreach ($files as $file) {
+            $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
+
+            if (file_exists($file)) {
+                $this->additionalComposerJsons[$file] = $file;
+            }
         }
     }
 
@@ -102,7 +118,7 @@ class ComposerJson
             }
         }
 
-        return $composers;
+        return $composers + $this->additionalComposerJsons;
     }
 
     public function readKey($key, $composerPath = '')
