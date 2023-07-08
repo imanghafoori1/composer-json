@@ -2,6 +2,7 @@
 
 namespace ImanGhafoori\ComposerJson;
 
+use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 
