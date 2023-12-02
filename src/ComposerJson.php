@@ -181,7 +181,7 @@ class ComposerJson
         return $classLists;
     }
 
-    public function getClassesWithin($composerPath, \Closure $filterClass, ?\Closure $pathFilter = null)
+    public function getClassesWithin($composerPath, \Closure $filterClass, \Closure $pathFilter = null)
     {
         $results = [];
         foreach ($this->getAllPhpFiles($composerPath) as $classFilePath) {
@@ -261,7 +261,7 @@ class ComposerJson
         [$namespaces, $paths] = self::flatten($paths, $namespaces);
         $path = '';
         foreach ($namespaces as $i => $ns) {
-            if (0 === strpos($namespace, $ns)) {
+            if (strpos($namespace, $ns) === 0) {
                 $path = \substr_replace($namespace, $paths[$i], 0, strlen($ns));
 
                 break;
@@ -279,7 +279,7 @@ class ComposerJson
         $className = str_replace('.php', '', basename($absPath));
 
         foreach ($psr4Mappings as $composerPath => $psr4Mapping) {
-            if (0 === strpos($relativePath, $composerPath)) {
+            if (strpos($relativePath, $composerPath) === 0) {
                 $correctNamespaces = NamespaceCalculator::getCorrectNamespaces($psr4Mapping, $relativePath);
 
                 return NamespaceCalculator::findShortest($correctNamespaces).'\\'.$className;
