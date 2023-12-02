@@ -101,6 +101,19 @@ class ComposerJson
         return $result;
     }
 
+    public function autoloadedFilesList($basePath)
+    {
+        $absoluteFilePaths = [];
+        foreach ($this->readAutoloadFiles() as $path => $files) {
+            $p = $basePath.'/'.trim($path, '/');
+            foreach (array_merge($files['autoload'], $files['autoload-dev']) as $filePath) {
+                $absoluteFilePaths[] = str_replace('/', DIRECTORY_SEPARATOR, $p.'/'.trim($filePath, '/'));
+            }
+        }
+
+        return $absoluteFilePaths;
+    }
+
     public function collectLocalRepos()
     {
         $composers = [];
