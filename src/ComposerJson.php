@@ -105,9 +105,9 @@ class ComposerJson
     {
         $absoluteFilePaths = [];
         foreach ($this->readAutoloadFiles() as $path => $files) {
-            $p = $basePath.'/'.trim($path, '/');
+            $p = rtrim($basePath.'/'.$path, '/\\');
             foreach (array_merge($files['autoload'], $files['autoload-dev']) as $filePath) {
-                $absoluteFilePaths[] = str_replace('/', DIRECTORY_SEPARATOR, $p.'/'.trim($filePath, '/'));
+                $absoluteFilePaths[] = str_replace('/', DIRECTORY_SEPARATOR, $p.'/'.trim($filePath, '\\/'));
             }
         }
 

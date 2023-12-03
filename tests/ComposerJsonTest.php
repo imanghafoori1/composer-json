@@ -149,6 +149,14 @@ class ComposerJsonTest extends TestCase
         ];
 
         $this->assertEquals($expected, $reader->readAutoloadFiles());
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertEquals([
+            __DIR__.str_replace('|', $ds, '|Stubs|a2|src|MyLibrary|functions.php'),
+            __DIR__.str_replace('|', $ds, '|Stubs|src|MyLib|functions.php'),
+            __DIR__.str_replace('|', $ds, '|Stubs|src|MyLib|functions2.php'),
+            __DIR__.str_replace('|', $ds, '|Stubs|src|MyLib|functions.php'),
+            __DIR__.str_replace('|', $ds, '|Stubs|src|MyLib|functions2.php'),
+        ], $reader->autoloadedFilesList(__DIR__.'/Stubs'));
     }
 
     /** @test */
