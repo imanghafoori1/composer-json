@@ -37,24 +37,28 @@ class ComposerJsonTest extends TestCase
     /** @test */
     public function getNamespacedClassFromPath()
     {
-        $reader = ComposerJson::make($p = __DIR__.'/Stubs/shortcut_namespace');
-        $namespace = $reader->getNamespacedClassFromPath($p.'/app/G1/G2.php');
+        $ds = function ($subject) {
+            return str_replace('/', DIRECTORY_SEPARATOR, $subject);
+        };
+
+        $reader = ComposerJson::make($p = $ds(__DIR__.'/Stubs/shortcut_namespace'));
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/app/G1/G2.php'));
         $this->assertEquals('App\G1\G2', $namespace);
 
-        $namespace = $reader->getNamespacedClassFromPath($p.'/app/Models/G1/G2.php');
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/app/Models/G1/G2.php'));
         $this->assertEquals('Models\G1\G2', $namespace);
 
-        $reader = ComposerJson::make($p = __DIR__.'/Stubs');
-        $namespace = $reader->getNamespacedClassFromPath($p.'/m1/G1/G2.php');
+        $reader = ComposerJson::make($p = $ds(__DIR__.'/Stubs'));
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/m1/G1/G2.php'));
         $this->assertEquals('Map\G1\G2', $namespace);
 
-        $namespace = $reader->getNamespacedClassFromPath($p.'/m2/G1/G2.php');
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/m2/G1/G2.php'));
         $this->assertEquals('Map\G1\G2', $namespace);
 
-        $namespace = $reader->getNamespacedClassFromPath($p.'/dapp/dapp/G1/G2.php');
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/dapp/dapp/G1/G2.php'));
         $this->assertEquals('Dapp\dapp\G1\G2', $namespace);
 
-        $namespace = $reader->getNamespacedClassFromPath($p.'/a2/ref/ref/G2.php');
+        $namespace = $reader->getNamespacedClassFromPath($ds($p.'/a2/ref/ref/G2.php'));
         $this->assertEquals('G2\ref\G2', $namespace);
     }
 
