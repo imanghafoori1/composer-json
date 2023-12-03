@@ -92,7 +92,7 @@ class NamespaceCalculator
         $relativePath = str_replace(['\\', '.php'], ['/', ''], $relativePath);
         foreach ($psr4Mapping as $namespacePrefix => $paths) {
             foreach ((array) $paths as $path) {
-                if (0 === strpos($relativePath, $path)) {
+                if (strpos($relativePath, $path) === 0) {
                     $correctNamespace = substr_replace($relativePath, $namespacePrefix, 0, strlen($path));
                     $correctNamespace = str_replace('/', '\\', $correctNamespace);
                     $correctNamespaces[] = self::getNamespaceFromFullClass($correctNamespace);
