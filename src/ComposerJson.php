@@ -173,8 +173,12 @@ class ComposerJson
         $classLists = [];
 
         foreach ($this->readAutoload(true) as $composerFilePath => $autoload) {
-            foreach ($autoload as $namespace => $psr4Path) {
-                $classLists[$composerFilePath][$namespace] = $this->getClassesWithin($psr4Path, $filter, $pathFilter);
+            foreach ($autoload as $namespace => $psr4Paths) {
+                $result = [];
+                foreach ((array) $psr4Paths as $psr4Path) {
+                    $result = array_merge($result, $this->getClassesWithin($psr4Path, $filter, $pathFilter));
+                }
+                $classLists[$composerFilePath][$namespace] = $result;
             }
         }
 
@@ -231,10 +235,14 @@ class ComposerJson
     public static function purgeAutoloadShortcuts($autoloads)
     {
         foreach ($autoloads as $composerPath => $psr4Mappings) {
-            foreach ($psr4Mappings as $namespace1 => $psr4Path1) {
-                foreach ($psr4Mappings as $psr4Path2) {
-                    if (strlen($psr4Path1) > strlen($psr4Path2) && self::startsWith($psr4Path1, $psr4Path2)) {
-                        unset($autoloads[$composerPath][$namespace1]);
+            foreach ($psr4Mappings as $namespace1 => $psr4Paths1) {
+                foreach ((array) $psr4Paths1 as $psr4Path1) {
+                    foreach ($psr4Mappings as $psr4Paths2) {
+                        foreach ((array)$psr4Paths2 as $psr4Path2) {
+                            if (strlen($psr4Path1) > strlen($psr4Path2) && self::startsWith($psr4Path1, $psr4Path2)) {
+                                unset($autoloads[$composerPath][$namespace1]);
+                            }
+                        }
                     }
                 }
             }

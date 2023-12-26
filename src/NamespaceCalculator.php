@@ -12,7 +12,7 @@ class NamespaceCalculator
 
         $classPath = \implode('\\', $classPath);
 
-        // Ensure back slashes in All Operating Systems.
+        // Ensure backslashes in All Operating Systems.
         $composerPath = \str_replace('/', '\\', $composerPath);
 
         // replace composer base_path with composer namespace
