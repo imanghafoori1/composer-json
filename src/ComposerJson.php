@@ -185,7 +185,7 @@ class ComposerJson
         return $classLists;
     }
 
-    public function getClassesWithin($composerPath, \Closure $filterClass, \Closure $pathFilter = null)
+    public function getClassesWithin($composerPath, \Closure $filterClass, ?\Closure $pathFilter = null)
     {
         $results = [];
         foreach ($this->getAllPhpFiles($composerPath) as $classFilePath) {
@@ -238,7 +238,7 @@ class ComposerJson
             foreach ($psr4Mappings as $namespace1 => $psr4Paths1) {
                 foreach ((array) $psr4Paths1 as $psr4Path1) {
                     foreach ($psr4Mappings as $psr4Paths2) {
-                        foreach ((array)$psr4Paths2 as $psr4Path2) {
+                        foreach ((array) $psr4Paths2 as $psr4Path2) {
                             if (strlen($psr4Path1) > strlen($psr4Path2) && self::startsWith($psr4Path1, $psr4Path2)) {
                                 unset($autoloads[$composerPath][$namespace1]);
                             }

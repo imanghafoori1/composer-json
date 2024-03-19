@@ -97,7 +97,7 @@ class GetClassProperties
                 continue;
             }
 
-            if (($tokens[$i][0] == $separator)) {
+            if ($tokens[$i][0] == $separator) {
                 $results .= '|';
                 $i++;
 

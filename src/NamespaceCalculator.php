@@ -117,4 +117,13 @@ class NamespaceCalculator
 
         return $subject;
     }
+
+    public static function getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace): string
+    {
+        $className = basename(str_replace(['.php', '\\'], ['', '/'], $absFilePath));
+        $relativePath = str_replace($basePath, '', $absFilePath);
+        $namespace = self::calculateCorrectNamespace($relativePath, $psr4Path, $psr4Namespace);
+
+        return $namespace ? ($namespace.'\\'.$className) : $className;
+    }
 }
