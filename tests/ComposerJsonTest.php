@@ -225,6 +225,7 @@ class ComposerJsonTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
     public function test_get_classmap()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/a3');
