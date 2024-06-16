@@ -95,7 +95,6 @@ class NamespaceCalculatorTest extends TestCase
         $r = NamespaceCalculator::getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace);
         $this->assertEquals('App\Hello\Name', $r);
 
-
         $absFilePath = "{$d}home{$d}proj{$d}app{$d}Hello{$d}Name";
         $r = NamespaceCalculator::getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace);
         $this->assertEquals('App\Hello\Name', $r);
