@@ -103,19 +103,19 @@ class ComposerJsonTest extends TestCase
         $reader = ComposerJson::make($p = __DIR__.'/Stubs/a3');
         $classList = $reader->getClasslists(null, null);
         $expected = [
-            "/" => [
-                "App\\" => [
+            '/' => [
+                'App\\' => [
                     0 => [
-                        "relativePath" => "",
-                        "relativePathname" => "a.php",
-                        "fileName" => "a.php",
-                        "currentNamespace" => "App",
-                        "absFilePath" => "E:\__coding__\my_github_repos\composer-json\\tests\Stubs\a3\app\a.php",
-                        "class" => "a",
-                        "type" => 369,
+                        'relativePath' => '',
+                        'relativePathname' => 'a.php',
+                        'fileName' => 'a.php',
+                        'currentNamespace' => 'App',
+                        'absFilePath' => "E:\__coding__\my_github_repos\composer-json\\tests\Stubs\a3\app\a.php",
+                        'class' => 'a',
+                        'type' => 369,
                     ],
                 ],
-                "Database\\Seeders\\" => [],
+                'Database\\Seeders\\' => [],
             ],
         ];
 
@@ -249,6 +249,7 @@ class ComposerJsonTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
     public function test_get_classmap()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/a3');
