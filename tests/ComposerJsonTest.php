@@ -182,7 +182,7 @@ class ComposerJsonTest extends TestCase
                     'currentNamespace' => '',
                     'absFilePath' => "{$p}{$d}app{$d}x{$d}e.php",
                     'class' => 'e',
-                    'correctNamespace' => 'App\x'
+                    'correctNamespace' => 'App\x',
                 ],
             ],
         ], $errors);
