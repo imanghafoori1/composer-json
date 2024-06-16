@@ -69,6 +69,12 @@ class ComposerJsonTest extends TestCase
                 'Tests\\' => 'tests/',
             ],
         ], $reader->readAutoload(true));
+
+        $this->assertEquals(
+            $reader->readAutoload(true),
+            $reader->readAutoloadPsr4(true)
+
+        );
     }
 
     public function test_read_autoload_psr4()
@@ -90,6 +96,77 @@ class ComposerJsonTest extends TestCase
         ];
 
         $this->assertEquals($expected, $reader->readAutoload());
+    }
+
+    public function test_getClasslists()
+    {
+        $d = DIRECTORY_SEPARATOR;
+        $reader = ComposerJson::make($p = __DIR__.$d.'Stubs'.$d.'a3');
+        $classList = $reader->getClasslists(null, null);
+        $expected = [
+            '/' => [
+                'App\\' => [
+                    0 => [
+                        'relativePath' => '',
+                        'relativePathname' => 'a.php',
+                        'fileName' => 'a.php',
+                        'currentNamespace' => 'App',
+                        'absFilePath' => "{$p}{$d}app{$d}a.php",
+                        'class' => 'a',
+                        'type' => T_CLASS,
+                    ],
+                    1 => [
+                        'relativePath' => '',
+                        'relativePathname' => 'b.php',
+                        'fileName' => 'b.php',
+                        'currentNamespace' => 'App\g',
+                        'absFilePath' => "{$p}{$d}app{$d}b.php",
+                        'class' => 'b',
+                        'type' => T_TRAIT,
+                    ],
+                    2 => [
+                        'relativePath' => '',
+                        'relativePathname' => 'c.php',
+                        'fileName' => 'c.php',
+                        'currentNamespace' => 'App',
+                        'absFilePath' => "{$p}{$d}app{$d}c.php",
+                        'class' => 'C',
+                        'type' => T_INTERFACE,
+                    ],
+                ],
+                'Database\\Seeders\\' => [],
+            ],
+        ];
+
+        $this->assertEquals($expected, $classList);
+
+        $errors = $reader->getErrorsLists($classList, function () {
+            return '';
+        });
+
+        $this->assertEquals([
+            '/' => [
+                0 => [
+                    'type' => 'namespace',
+                    'correctNamespace' => 'App',
+                    'relativePath' => "app{$d}b.php",
+                    'relativePathname' => 'b.php',
+                    'fileName' => 'b.php',
+                    'currentNamespace' => 'App\g',
+                    'absFilePath' => "{$p}{$d}app{$d}b.php",
+                    'class' => 'b',
+                ],
+                1 => [
+                    'type' => 'filename',
+                    'relativePath' => "app{$d}c.php",
+                    'relativePathname' => 'c.php',
+                    'fileName' => 'c.php',
+                    'currentNamespace' => 'App',
+                    'absFilePath' => "{$p}{$d}app{$d}c.php",
+                    'class' => 'C',
+                ],
+            ],
+        ], $errors);
     }
 
     public function test_get_namespace_from_relative_path()
@@ -182,7 +259,8 @@ class ComposerJsonTest extends TestCase
             ],
             'autoload' => [
                 'classmap' => [
-                    'database', 'tests/TestCase.php',
+                    'database',
+                    'tests/TestCase.php',
                 ],
                 'psr-4' => [
                     'App\\' => 'app/',
@@ -218,5 +296,16 @@ class ComposerJsonTest extends TestCase
         ];
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function test_get_classmap()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs/a3');
+        $result = $reader->readAutoloadClassMap();
+        $this->assertEquals([
+            '/' => [
+                0 => 'asc',
+            ],
+        ], $result);
     }
 }
