@@ -69,6 +69,12 @@ class ComposerJsonTest extends TestCase
                 'Tests\\' => 'tests/',
             ],
         ], $reader->readAutoload(true));
+
+        $this->assertEquals(
+            $reader->readAutoload(true),
+            $reader->readAutoloadPsr4(true)
+
+        );
     }
 
     public function test_read_autoload_psr4()
@@ -182,7 +188,8 @@ class ComposerJsonTest extends TestCase
             ],
             'autoload' => [
                 'classmap' => [
-                    'database', 'tests/TestCase.php',
+                    'database',
+                    'tests/TestCase.php',
                 ],
                 'psr-4' => [
                     'App\\' => 'app/',
@@ -218,5 +225,16 @@ class ComposerJsonTest extends TestCase
         ];
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function test_get_classmap()
+    {
+        $reader = ComposerJson::make(__DIR__.'/Stubs/a3');
+        $result = $reader->readAutoloadClassMap();
+        $this->assertEquals([
+            '/' => [
+                0 => 'asc',
+            ],
+        ], $result);
     }
 }
