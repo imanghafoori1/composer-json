@@ -2,6 +2,7 @@
 
 namespace ImanGhafoori\ComposerJson;
 
+use Closure;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
@@ -168,9 +169,12 @@ class ComposerJson
         return $this->result[$absPath];
     }
 
-    public function getClasslists(?\Closure $filter, ?\Closure $pathFilter)
+    public function getClasslists(?Closure $filter, ?Closure $pathFilter)
     {
         $classLists = [];
+        $filter = $filter ?: function () {
+            return true;
+        };
 
         foreach ($this->readAutoload(true) as $composerFilePath => $autoload) {
             foreach ($autoload as $namespace => $psr4Paths) {
@@ -185,7 +189,7 @@ class ComposerJson
         return $classLists;
     }
 
-    public function getClassesWithin($composerPath, \Closure $filterClass, ?\Closure $pathFilter = null)
+    public function getClassesWithin($composerPath, Closure $filterClass, ?Closure $pathFilter = null)
     {
         $results = [];
         foreach ($this->getAllPhpFiles($composerPath) as $classFilePath) {
@@ -251,7 +255,7 @@ class ComposerJson
         return $autoloads;
     }
 
-    public function getErrorsLists(array $classLists, ?\Closure $onCheck)
+    public function getErrorsLists(array $classLists, ?Closure $onCheck)
     {
         $errorsLists = [];
         $autoloads = $this->readAutoload();
