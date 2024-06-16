@@ -111,7 +111,7 @@ class GetClassListTest extends TestCase
                     'absFilePath' => "{$p}{$d}app{$d}z{$d}app{$d}a.php",
                     'class' => 'a',
                     'correctNamespace' => 'App\z\app',
-                ]
+                ],
             ],
         ], $errors);
     }
