@@ -104,19 +104,19 @@ class ComposerJsonTest extends TestCase
         $reader = ComposerJson::make($p = __DIR__.$d.'Stubs'.$d.'a3');
         $classList = $reader->getClasslists(null, null);
         $expected = [
-            "/" => [
-                "App\\" => [
+            '/' => [
+                'App\\' => [
                     0 => [
-                        "relativePath" => "",
-                        "relativePathname" => "a.php",
-                        "fileName" => "a.php",
-                        "currentNamespace" => "App",
-                        "absFilePath" => "{$p}{$d}app{$d}a.php",
-                        "class" => "a",
-                        "type" => T_CLASS,
+                        'relativePath' => '',
+                        'relativePathname' => 'a.php',
+                        'fileName' => 'a.php',
+                        'currentNamespace' => 'App',
+                        'absFilePath' => "{$p}{$d}app{$d}a.php",
+                        'class' => 'a',
+                        'type' => T_CLASS,
                     ],
                 ],
-                "Database\\Seeders\\" => [],
+                'Database\\Seeders\\' => [],
             ],
         ];
 

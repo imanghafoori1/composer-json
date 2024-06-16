@@ -2,6 +2,6 @@
 
 namespace App;
 
-class a {
-
+class a
+{
 }
