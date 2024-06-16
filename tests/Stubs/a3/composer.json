@@ -6,6 +6,9 @@
             "Models\\": "app/Models/",
             "Test\\": "app/d/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "classmap": [
+            "asc"
+        ]
     }
 }
