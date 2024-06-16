@@ -7,8 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class NamespaceCalculatorTest extends TestCase
 {
-    /** @test */
-    public function can_extract_namespace()
+    public function test_can_extract_namespace()
     {
         $namespaces = 'Imanghafoori\LaravelMicroscope\Analyzers';
         $_className = "Imanghafoori\LaravelMicroscope\Analyzers\NamespaceCorrector";
@@ -18,8 +17,7 @@ class NamespaceCalculatorTest extends TestCase
         $this->assertEquals('B', NamespaceCalculator::getNamespaceFromFullClass('B\A'));
     }
 
-    /** @test */
-    public function calculate_correct_namespace()
+    public function test_calculate_correct_namespace()
     {
         $ds = DIRECTORY_SEPARATOR;
         $path = "app{$ds}Hello{$ds}Name.php";
@@ -40,8 +38,7 @@ class NamespaceCalculatorTest extends TestCase
         $this->assertEquals("Foo\Hello", $r);
     }
 
-    /** @test */
-    public function check_namespace()
+    public function test_check_namespace()
     {
         $fileName = 'Hello.php';
         $class = 'Hello';
@@ -73,8 +70,7 @@ class NamespaceCalculatorTest extends TestCase
         ], $result);
     }
 
-    /** @test */
-    public function can_detect_same_namespaces()
+    public function test_can_detect_same_namespaces()
     {
         $class1 = "Imanghafoori\LaravelMicroscope\Analyzers\Iman";
         $class2 = "Imanghafoori\LaravelMicroscope\Analyzers\Ghafoori";
@@ -86,5 +82,22 @@ class NamespaceCalculatorTest extends TestCase
         $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1, $class3));
         $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1.'.php', $class3.'.php'));
         $this->assertEquals(false, NamespaceCalculator::haveSameNamespace($class1, 'Faalse'));
+    }
+
+    public function test_get_namespace_from_path()
+    {
+        $d = DIRECTORY_SEPARATOR;
+        $absFilePath = "{$d}home{$d}proj{$d}app{$d}Hello{$d}Name.php";
+        $basePath = "{$d}home{$d}proj{$d}";
+        $psr4Path = 'app/';
+        $psr4Namespace = 'App\\';
+
+        $r = NamespaceCalculator::getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace);
+        $this->assertEquals('App\Hello\Name', $r);
+
+
+        $absFilePath = "{$d}home{$d}proj{$d}app{$d}Hello{$d}Name";
+        $r = NamespaceCalculator::getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace);
+        $this->assertEquals('App\Hello\Name', $r);
     }
 }

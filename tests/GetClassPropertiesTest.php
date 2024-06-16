@@ -7,8 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class GetClassPropertiesTest extends TestCase
 {
-    /** @test */
-    public function can_detect_method_visibility()
+    public function test_can_detect_method_visibility()
     {
         [$namespace, $name, $type, $parent, $interfaces] = GetClassProperties::fromFilePath(__DIR__.'/Stubs/stubs/HomeController.stub');
 
@@ -19,8 +18,7 @@ class GetClassPropertiesTest extends TestCase
         $this->assertEquals('Countable|MyInterface', $interfaces);
     }
 
-    /** @test */
-    public function can_detect_multi_extend()
+    public function test_can_detect_multi_extend()
     {
         [$namespace, $name, $type, $parent, $interfaces] = GetClassProperties::fromFilePath(__DIR__.'/Stubs/stubs/multi_extend_interface.stub');
 
@@ -30,8 +28,7 @@ class GetClassPropertiesTest extends TestCase
         $this->assertEquals('AnotherBaseInterface|Arrayable|Jsonable|JsonSerializable', $parent);
     }
 
-    /** @test */
-    public function can_detect_multi_extend_1()
+    public function test_can_detect_multi_extend_1()
     {
         [$namespace, $name, $type, $parent, $interfaces] = GetClassProperties::fromFilePath(__DIR__.'/Stubs/stubs/interface_sample.stub');
 
@@ -41,8 +38,7 @@ class GetClassPropertiesTest extends TestCase
         $this->assertEquals('IncompleteTest', $parent);
     }
 
-    /** @test */
-    public function can_detect_simple_classes()
+    public function test_can_detect_simple_classes()
     {
         [$namespace, $name, $type, $parent, $interfaces] = GetClassProperties::fromFilePath(__DIR__.'/Stubs/stubs/I_am_simple.stub');
 
@@ -52,8 +48,7 @@ class GetClassPropertiesTest extends TestCase
         $this->assertEquals('', $parent);
     }
 
-    /** @test */
-    public function non_php_file()
+    public function test_non_php_file()
     {
         [$namespace, $name, $type, $parent, $interfaces] = GetClassProperties::fromFilePath(__DIR__.'/Stubs/stubs/non_php_opening_tag.stub');
 

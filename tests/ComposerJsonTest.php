@@ -7,8 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ComposerJsonTest extends TestCase
 {
-    /** @test */
-    public function getRelativePathFromNamespace()
+    public function test_getRelativePathFromNamespace()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
         $relativePath = $reader->getRelativePathFromNamespace('App\\App\\Models\\Tests\\User');
@@ -34,8 +33,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals('dapp'.$ns.'Tests'.$ns.'User', $relativePath);
     }
 
-    /** @test */
-    public function getNamespacedClassFromPath()
+    public function test_getNamespacedClassFromPath()
     {
         $ds = function ($subject) {
             return str_replace('/', DIRECTORY_SEPARATOR, $subject);
@@ -62,8 +60,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals('G2\ref\G2', $namespace);
     }
 
-    /** @test */
-    public function read_autoload_psr4_purged()
+    public function test_read_autoload_psr4_purged()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs/shortcut_namespace');
         $this->assertEquals([
@@ -74,8 +71,7 @@ class ComposerJsonTest extends TestCase
         ], $reader->readAutoload(true));
     }
 
-    /** @test */
-    public function read_autoload_psr4()
+    public function test_read_autoload_psr4()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
 
@@ -96,8 +92,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals($expected, $reader->readAutoload());
     }
 
-    /** @test */
-    public function get_namespace_from_relative_path()
+    public function test_get_namespace_from_relative_path()
     {
         $reader = ComposerJson::make($p = __DIR__.'/Stubs/a3');
         $result = $reader->getNamespacedClassFromPath('app/Hello.php');
@@ -116,8 +111,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals('Test\\appollo', $result);
     }
 
-    /** @test */
-    public function readKey()
+    public function test_readKey()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
         $this->assertEquals('iman/ghafoori', $reader->readKey('name'));
@@ -126,8 +120,7 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals(['framework', 'package'], $reader->readKey('keywords'));
     }
 
-    /** @test */
-    public function read_autoload_files()
+    public function test_read_autoload_files()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
 
@@ -159,22 +152,19 @@ class ComposerJsonTest extends TestCase
         ], $reader->autoloadedFilesList(__DIR__.'/Stubs'));
     }
 
-    /** @test */
-    public function expects_real_paths()
+    public function test_expects_real_paths()
     {
         $this->expectException(\InvalidArgumentException::class);
         ComposerJson::make(__DIR__.'/Stubs/absent');
     }
 
-    /** @test */
-    public function expects_composer_json_file_to_exist()
+    public function test_expects_composer_json_file_to_exist()
     {
         $this->expectException(\InvalidArgumentException::class);
         ComposerJson::make(__DIR__.'/Stubs/empty');
     }
 
-    /** @test */
-    public function readComposerFileData()
+    public function test_readComposerFileData()
     {
         $reader = ComposerJson::make(__DIR__.'/Stubs');
         $actual = $reader->readComposerFileData();
