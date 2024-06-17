@@ -73,7 +73,6 @@ class ComposerJsonTest extends TestCase
         $this->assertEquals(
             $reader->readAutoload(true),
             $reader->readAutoloadPsr4(true)
-
         );
     }
 
