@@ -40,7 +40,7 @@ jobs:
 
         - name: PHPUnit
           run: |
-            ./vendor/bin/phpunit --stop-on-failure --coverage-clover ./clover.xml
+            ./vendor/bin/phpunit --stop-on-failure --coverage-clover ./coverage.xml
           env:
             XDEBUG_MODE: coverage
 
@@ -55,7 +55,7 @@ jobs:
             COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           run: |
             composer global require php-coveralls/php-coveralls
-            php-coveralls --coverage_clover=./clover.xml --json_path=./coverall.xml -v
+            php-coveralls --coverage_clover=./coverage.xml --json_path=./coverall.xml -v
         - name: "Send code coverage report to Codecov.io"
           env:
             CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
