@@ -2,8 +2,11 @@
 
 namespace ImanGhafoori\ComposerJson\Tests;
 
+use ImanGhafoori\ComposerJson\ClassDefinition;
+use ImanGhafoori\ComposerJson\Entity;
 use ImanGhafoori\ComposerJson\NamespaceCalculator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 class NamespaceCalculatorTest extends TestCase
 {
@@ -50,24 +53,51 @@ class NamespaceCalculatorTest extends TestCase
         $relativePath = 'app'.$ds.'Models'.$ds.'Hello.php';
 
         $currentNamespace = 'App\Models';
-        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName);
+        $entity = Entity::make(
+            new SplFileInfo('Hello.php', $relativePath, $relativePath),
+            ClassDefinition::make('Hello', T_CLASS, '', $currentNamespace, ''),
+            __DIR__
+        );
+
+        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $entity);
         $this->assertNull($result);
 
         $currentNamespace = 'Models';
-        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName);
+        $entity = Entity::make(
+            new SplFileInfo('Hello.php', $relativePath, $relativePath),
+            ClassDefinition::make('Hello', T_CLASS, '', $currentNamespace, ''),
+            __DIR__
+        );
+
+        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $entity);
         $this->assertNull($result);
 
         $fileName = 'hello.php';
-        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName);
-        $this->assertEquals(['type' => 'filename'], $result);
+        $entity = Entity::make(
+            new SplFileInfo($fileName, $relativePath, $relativePath),
+            ClassDefinition::make('Hello', T_CLASS, '', $currentNamespace, ''),
+            __DIR__
+        );
+
+        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $entity);
+        $this->assertEquals($result->errorType(), 'filename');
 
         $fileName = 'Hello.php';
         $currentNamespace = 'App\Models\K';
-        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName);
+        $entity = Entity::make(
+            new SplFileInfo($fileName, $relativePath, $relativePath),
+            ClassDefinition::make('Hello', T_CLASS, '', $currentNamespace, ''),
+            __DIR__
+        );
+
+        $result = NamespaceCalculator::checkNamespace($relativePath, $psr4Mapping, $entity);
         $this->assertEquals([
             'type' => 'namespace',
             'correctNamespace' => 'Models',
-        ], $result);
+        ],[
+            'type' => $result->errorType(),
+            'correctNamespace' => $result->getShortest(),
+        ]);
     }
 
     public function test_can_detect_same_namespaces()
