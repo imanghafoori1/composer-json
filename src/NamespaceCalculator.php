@@ -2,6 +2,10 @@
 
 namespace ImanGhafoori\ComposerJson;
 
+use Closure;
+use ImanGhafoori\ComposerJson\NamespaceErrors\FilenameError;
+use ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError;
+
 class NamespaceCalculator
 {
     public static function calculateCorrectNamespace($relativeClassPath, $composerPath, $rootNamespace)
@@ -28,19 +32,20 @@ class NamespaceCalculator
         );
     }
 
-    public static function findPsr4Errors($basePath, $psr4Mapping, $classLists, ?\Closure $onCheck)
+    public static function findPsr4Errors($basePath, $psr4Mapping, $classLists, ?Closure $onCheck)
     {
         $errors = [];
 
         foreach ($classLists as $list) {
             foreach ($list as $class) {
+                /**
+                 * @var $class \ImanGhafoori\ComposerJson\Entity
+                 */
                 $onCheck && $onCheck($class);
                 $relativePath = \trim(str_replace($basePath, '', $class['absFilePath']), '/\\');
-                $error = self::checkNamespace($relativePath, $psr4Mapping, $class['currentNamespace'], $class['class'], $class['fileName']);
+                $error = self::checkNamespace($relativePath, $psr4Mapping, $class);
 
                 if ($error) {
-                    $error['relativePath'] = $relativePath;
-                    $error = $error + $class;
                     $errors[] = $error;
                 }
             }
@@ -49,19 +54,14 @@ class NamespaceCalculator
         return $errors;
     }
 
-    public static function checkNamespace($relativePath, $psr4Mapping, $currentNamespace, $class, $fileName)
+    public static function checkNamespace($relativePath, $psr4Mapping, $class)
     {
         $correctNamespaces = self::getCorrectNamespaces($psr4Mapping, $relativePath);
 
-        if (! in_array($currentNamespace, $correctNamespaces)) {
-            return [
-                'type' => 'namespace',
-                'correctNamespace' => self::findShortest($correctNamespaces),
-            ];
-        } elseif (($class.'.php') !== $fileName) {
-            return [
-                'type' => 'filename',
-            ];
+        if (! in_array($class['currentNamespace'], $correctNamespaces)) {
+            return new NamespaceError($correctNamespaces, $class);
+        } elseif (($class['class'].'.php') !== $class['fileName']) {
+            return new FilenameError($class['class'], $class);
         }
     }
 
@@ -86,6 +86,12 @@ class NamespaceCalculator
         });
     }
 
+    /**
+     * @param $psr4Mapping
+     * @param $relativePath
+     *
+     * @return string[]
+     */
     public static function getCorrectNamespaces($psr4Mapping, $relativePath)
     {
         $correctNamespaces = [];

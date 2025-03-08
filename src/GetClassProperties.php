@@ -4,7 +4,7 @@ namespace ImanGhafoori\ComposerJson;
 
 class GetClassProperties
 {
-    public static function fromFilePath($filePath, $depth = 2500)
+    public static function fromFilePath($filePath, $depth = 2500): ClassDefinition
     {
         $fp = fopen($filePath, 'r');
         $buffer = fread($fp, $depth);
@@ -12,17 +12,17 @@ class GetClassProperties
         $tokens = token_get_all($buffer.'/**/');
 
         if (strpos($buffer, '{') === false || ($tokens[0][0] ?? null) !== T_OPEN_TAG) {
-            return [null, null, null, null, null];
+            return new ClassDefinition;
         }
 
         return self::readClassDefinition($tokens);
     }
 
-    public static function readClassDefinition($tokens)
+    public static function readClassDefinition($tokens): ClassDefinition
     {
         ! defined('T_ENUM') && define('T_ENUM', -1654);
         $type = $class = null;
-        $allTokensCount = \count($tokens);
+        $allTokensCount = count($tokens);
         $parent = null;
         $interfaces = $namespace = '';
 
@@ -61,13 +61,7 @@ class GetClassProperties
             }
         }
 
-        return [
-            \ltrim($namespace, '\\'),
-            $class,
-            $type,
-            $parent,
-            $interfaces,
-        ];
+        return ClassDefinition::make($class, $type, $interfaces, $namespace, $parent);
     }
 
     /**
@@ -104,7 +98,7 @@ class GetClassProperties
                 continue;
             }
 
-            if (\in_array($tokens[$i][0], $terminators)) {
+            if (in_array($tokens[$i][0], $terminators)) {
                 // we go ahead and collect until we reach:
                 // 1. an opening curly brace {
                 // 2. or a semi-colon ;

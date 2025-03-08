@@ -3,8 +3,8 @@
 namespace ImanGhafoori\ComposerJson;
 
 use Closure;
-use Exception;
 use InvalidArgumentException;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
 class ComposerJson
@@ -53,6 +53,9 @@ class ComposerJson
         $this->ignoredNamespaces = $ignoredNamespaces;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function readAutoloadClassMap()
     {
         $result = [];
@@ -102,6 +105,10 @@ class ComposerJson
         return $result;
     }
 
+    /**
+     * @param $basePath
+     * @return string[]
+     */
     public function autoloadedFilesList($basePath)
     {
         $absoluteFilePaths = [];
@@ -136,6 +143,11 @@ class ComposerJson
         return $composers + $this->additionalComposerJsons;
     }
 
+    /**
+     * @param  array|string  $key
+     * @param  string  $composerPath
+     * @return array|null
+     */
     public function readKey($key, $composerPath = '')
     {
         $composer = $this->readComposerFileData($composerPath);
@@ -171,18 +183,18 @@ class ComposerJson
 
     public function getClasslists(?Closure $filter, ?Closure $pathFilter)
     {
-        $classLists = [];
         $filter = $filter ?: function () {
             return true;
         };
+        $classLists = new ClassLists;
 
         foreach ($this->readAutoload(true) as $composerFilePath => $autoload) {
             foreach ($autoload as $namespace => $psr4Paths) {
-                $result = [];
+                $classes = [];
                 foreach ((array) $psr4Paths as $psr4Path) {
-                    $result = array_merge($result, $this->getClassesWithin($psr4Path, $filter, $pathFilter));
+                    $classes = array_merge($classes, $this->getClassesWithin($psr4Path, $filter, $pathFilter));
                 }
-                $classLists[$composerFilePath][$namespace] = $result;
+                $classLists->addList($composerFilePath, $namespace, $classes);
             }
         }
 
@@ -191,6 +203,9 @@ class ComposerJson
 
     public function getClassesWithin($composerPath, Closure $filterClass, ?Closure $pathFilter = null)
     {
+        /**
+         * @var $results array<int, \ImanGhafoori\ComposerJson\Entity>
+         */
         $results = [];
         foreach ($this->getAllPhpFiles($composerPath) as $classFilePath) {
             $absFilePath = $classFilePath->getRealPath();
@@ -204,27 +219,19 @@ class ComposerJson
                 continue;
             }
 
-            [$currentNamespace, $class, $parent, $type] = $this->readClass($absFilePath);
+            $definition = $this->readClass($absFilePath);
 
             // Skip if there is no class/trait/interface definition found.
             // For example a route file or a config file.
-            if (! $class) {
+            if (! $definition->getName()) {
                 continue;
             }
 
-            if ($filterClass($classFilePath, $currentNamespace, $class, $parent) === false) {
+            if ($filterClass($classFilePath, $definition->getNamespace(), $definition->getName(), $definition->getParent()) === false) {
                 continue;
             }
 
-            $results[] = [
-                'relativePath' => $classFilePath->getRelativePath(),
-                'relativePathname' => $classFilePath->getRelativePathname(),
-                'fileName' => $classFilePath->getFilename(),
-                'currentNamespace' => $currentNamespace,
-                'absFilePath' => $absFilePath,
-                'class' => $class,
-                'type' => $type,
-            ];
+            $results[] = Entity::make($classFilePath, $definition, $this->basePath);
         }
 
         return $results;
@@ -307,7 +314,7 @@ class ComposerJson
      * get all ".php" files in directory by giving a path.
      *
      * @param  string  $path  Directory path
-     * @return \Symfony\Component\Finder\Finder
+     * @return \Symfony\Component\Finder\Finder|array
      */
     public function getAllPhpFiles($path, $basePath = '')
     {
@@ -321,25 +328,20 @@ class ComposerJson
 
         try {
             return Finder::create()->files()->name('*.php')->sortByName()->in($path);
-        } catch (Exception $e) {
+        } catch (DirectoryNotFoundException $e) {
             return [];
         }
     }
 
-    private function readClass($absFilePath)
+    private function readClass($absFilePath): ClassDefinition
     {
         $buffer = self::$buffer;
         do {
-            [
-                $currentNamespace,
-                $class,
-                $type,
-                $parent,
-            ] = GetClassProperties::fromFilePath($absFilePath, $buffer);
+            $definition = GetClassProperties::fromFilePath($absFilePath, $buffer);
             $buffer = $buffer + 1000;
-        } while ($currentNamespace && ! $class && $buffer < 6000);
+        } while ($definition->getNamespace() && ! $definition->getName() && $buffer < 6000);
 
-        return [$currentNamespace, $class, $parent, $type];
+        return $definition;
     }
 
     private static function startsWith($haystack, $needles)
