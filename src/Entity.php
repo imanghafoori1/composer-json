@@ -66,7 +66,6 @@ class Entity implements ArrayAccess
     }
 
     #[\ReturnTypeWillChange]
-
     public function offsetExists($offset)
     {
         // TODO: Implement offsetExists() method.
@@ -79,14 +78,12 @@ class Entity implements ArrayAccess
     }
 
     #[\ReturnTypeWillChange]
-
     public function offsetSet($offset, $value)
     {
         // TODO: Implement offsetSet() method.
     }
 
     #[\ReturnTypeWillChange]
-
     public function offsetUnset($offset)
     {
         // TODO: Implement offsetUnset() method.
