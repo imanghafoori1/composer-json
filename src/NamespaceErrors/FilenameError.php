@@ -17,9 +17,9 @@ class FilenameError
      */
     public $entity;
 
-    public function __construct($filename, Entity $entity)
+    public function __construct(Entity $entity)
     {
-        $this->filename = $filename;
+        $this->filename = $entity->getEntityName().'.php';
         $this->entity = $entity;
     }
 
@@ -27,5 +27,10 @@ class FilenameError
     public function errorType()
     {
         return 'filename';
+    }
+
+    public function getCorrectFileName()
+    {
+        return $this->filename;
     }
 }

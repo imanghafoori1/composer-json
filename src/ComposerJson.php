@@ -154,7 +154,7 @@ class ComposerJson
 
         $value = $this->data_get($composer, $key, []);
 
-        if (\in_array($key, ['autoload.psr-4', 'autoload-dev.psr-4'])) {
+        if (in_array($key, ['autoload.psr-4', 'autoload-dev.psr-4'])) {
             $value = $this->normalizePaths($value, $composerPath);
         }
 
@@ -267,7 +267,7 @@ class ComposerJson
         $errorsLists = [];
         $autoloads = $this->readAutoload();
         foreach ($classLists as $composerPath => $classList) {
-            $errorsLists[$composerPath] = NamespaceCalculator::findPsr4Errors($this->basePath, $autoloads[$composerPath], $classList, $onCheck);
+            $errorsLists[$composerPath] = NamespaceCalculator::findPsr4Errors($autoloads[$composerPath], $classList, $onCheck);
         }
 
         return $errorsLists;
@@ -281,7 +281,7 @@ class ComposerJson
         $path = '';
         foreach ($namespaces as $i => $ns) {
             if (strpos($namespace, $ns) === 0) {
-                $path = \substr_replace($namespace, $paths[$i], 0, strlen($ns));
+                $path = substr_replace($namespace, $paths[$i], 0, strlen($ns));
 
                 break;
             }

@@ -32,36 +32,32 @@ class NamespaceCalculator
         );
     }
 
-    public static function findPsr4Errors($basePath, $psr4Mapping, $classLists, ?Closure $onCheck)
+    public static function findPsr4Errors($psr4Mapping, $classLists, ?Closure $onCheck)
     {
         $errors = [];
 
         foreach ($classLists as $list) {
-            foreach ($list as $class) {
+            foreach ($list as $entity) {
                 /**
-                 * @var $class \ImanGhafoori\ComposerJson\Entity
+                 * @var $entity \ImanGhafoori\ComposerJson\Entity
                  */
-                $onCheck && $onCheck($class);
-                $relativePath = \trim(str_replace($basePath, '', $class['absFilePath']), '/\\');
-                $error = self::checkNamespace($relativePath, $psr4Mapping, $class);
-
-                if ($error) {
-                    $errors[] = $error;
-                }
+                $onCheck && $onCheck($entity);
+                $error = self::checkNamespace($entity->getRelativePath(), $psr4Mapping, $entity);
+                $error && ($errors[] = $error);
             }
         }
 
         return $errors;
     }
 
-    public static function checkNamespace($relativePath, $psr4Mapping, $class)
+    public static function checkNamespace($relativePath, $psr4Mapping, Entity $class)
     {
         $correctNamespaces = self::getCorrectNamespaces($psr4Mapping, $relativePath);
 
-        if (! in_array($class['currentNamespace'], $correctNamespaces)) {
+        if (! in_array($class->getClassDefinition()->getNamespace(), $correctNamespaces)) {
             return new NamespaceError($correctNamespaces, $class);
-        } elseif (($class['class'].'.php') !== $class['fileName']) {
-            return new FilenameError($class['class'], $class);
+        } elseif (($class->getEntityName().'.php') !== $class->getFileName()) {
+            return new FilenameError($class);
         }
     }
 

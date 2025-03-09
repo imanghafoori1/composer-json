@@ -32,9 +32,9 @@ class Entity implements ArrayAccess
         return $object;
     }
 
-    public function getRelativePath()
+    public function getRelativePath(): string
     {
-        return $this->classPath->getRelativePath();
+        return trim(str_replace($this->basePath, '', $this->classPath->getRealPath()), '/\\');
     }
 
     public function getFileName()
@@ -52,16 +52,36 @@ class Entity implements ArrayAccess
         return $this->classDefinition;
     }
 
+    public function getEntityName(): string
+    {
+        return $this->classDefinition->getEntityName();
+    }
+
+    public function getAbsolutePath(): string
+    {
+        return $this->classPath->getRealPath();
+    }
+
+    public function getNamespace()
+    {
+        return $this->classDefinition->getNamespace();
+    }
+
+    public function getType()
+    {
+        return $this->classDefinition->getType();
+    }
+
     public function toArray()
     {
         return [
-            'relativePath' => trim(str_replace($this->basePath, '', $this->classPath->getRealPath()), '/\\'),
+            'relativePath' => $this->getRelativePath(),
             'relativePathname' => $this->classPath->getRelativePathname(),
             'fileName' => $this->classPath->getFilename(),
-            'currentNamespace' => $this->classDefinition->getNamespace(),
+            'currentNamespace' => $this->getNamespace(),
             'absFilePath' => $this->classPath->getRealPath(),
             'class' => $this->classDefinition->getEntityName(),
-            'type' => $this->classDefinition->getType(),
+            'type' => $this->getType(),
         ];
     }
 
