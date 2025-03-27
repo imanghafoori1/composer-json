@@ -8,6 +8,9 @@ use ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError;
 
 class NamespaceCalculator
 {
+    /**
+     * @return string
+     */
     public static function calculateCorrectNamespace($relativeClassPath, $composerPath, $rootNamespace)
     {
         $classPath = \explode(DIRECTORY_SEPARATOR, $relativeClassPath);
@@ -32,39 +35,48 @@ class NamespaceCalculator
         );
     }
 
-    public static function findPsr4Errors($basePath, $psr4Mapping, $classLists, ?Closure $onCheck)
+    /**
+     * @param  $psr4Mapping
+     * @param  array<string, array<int, \ImanGhafoori\ComposerJson\Entity>>  $classLists
+     * @param \Closure|null $onCheck
+     * @return array<int, \ImanGhafoori\ComposerJson\NamespaceErrors\FilenameError|\ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError>
+     */
+    public static function findPsr4Errors($psr4Mapping, $classLists, ?Closure $onCheck)
     {
         $errors = [];
 
         foreach ($classLists as $list) {
-            foreach ($list as $class) {
+            foreach ($list as $entity) {
                 /**
-                 * @var $class \ImanGhafoori\ComposerJson\Entity
+                 * @var $entity \ImanGhafoori\ComposerJson\Entity
                  */
-                $onCheck && $onCheck($class);
-                $relativePath = \trim(str_replace($basePath, '', $class['absFilePath']), '/\\');
-                $error = self::checkNamespace($relativePath, $psr4Mapping, $class);
-
-                if ($error) {
-                    $errors[] = $error;
-                }
+                $onCheck && $onCheck($entity);
+                $error = self::checkNamespace($entity->getRelativePath(), $psr4Mapping, $entity);
+                $error && ($errors[] = $error);
             }
         }
 
         return $errors;
     }
 
-    public static function checkNamespace($relativePath, $psr4Mapping, $class)
+    /**
+     * @return \ImanGhafoori\ComposerJson\NamespaceErrors\FilenameError|\ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError
+     */
+    public static function checkNamespace($relativePath, $psr4Mapping, Entity $class)
     {
         $correctNamespaces = self::getCorrectNamespaces($psr4Mapping, $relativePath);
 
-        if (! in_array($class['currentNamespace'], $correctNamespaces)) {
+        if (! in_array($class->getClassDefinition()->getNamespace(), $correctNamespaces)) {
             return new NamespaceError($correctNamespaces, $class);
-        } elseif (($class['class'].'.php') !== $class['fileName']) {
-            return new FilenameError($class['class'], $class);
+        } elseif (($class->getEntityName().'.php') !== $class->getFileName()) {
+            return new FilenameError($class);
         }
     }
 
+    /**
+     * @param string $class
+     * @return string
+     */
     public static function getNamespaceFromFullClass($class)
     {
         $segments = explode('\\', $class);
@@ -73,11 +85,20 @@ class NamespaceCalculator
         return trim(implode('\\', $segments), '\\');
     }
 
+    /**
+     * @param string $class1
+     * @param string $class2
+     * @return bool
+     */
     public static function haveSameNamespace($class1, $class2)
     {
         return self::getNamespaceFromFullClass($class1) === self::getNamespaceFromFullClass($class2);
     }
 
+    /**
+     * @param string[] $correctNamespaces
+     * @return string
+     */
     public static function findShortest($correctNamespaces)
     {
         // finds the shortest namespace
@@ -87,8 +108,9 @@ class NamespaceCalculator
     }
 
     /**
-     * @param  $psr4Mapping
-     * @param  $relativePath
+     * @param $psr4Mapping
+     * @param $relativePath
+     *
      * @return string[]
      */
     public static function getCorrectNamespaces($psr4Mapping, $relativePath)
@@ -108,12 +130,11 @@ class NamespaceCalculator
         return $correctNamespaces;
     }
 
+    /**
+     * @return string
+     */
     private static function replaceFirst($search, $replace, $subject)
     {
-        if ($search == '') {
-            return $subject;
-        }
-
         $position = strpos($subject, $search);
 
         if ($position !== false) {
@@ -123,6 +144,9 @@ class NamespaceCalculator
         return $subject;
     }
 
+    /**
+     * @return string
+     */
     public static function getNamespaceFromPath($absFilePath, $basePath, $psr4Path, $psr4Namespace): string
     {
         $className = basename(str_replace(['.php', '\\'], ['', '/'], $absFilePath));

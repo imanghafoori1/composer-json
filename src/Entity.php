@@ -3,6 +3,7 @@
 namespace ImanGhafoori\ComposerJson;
 
 use ArrayAccess;
+use JetBrains\PhpStorm\ExpectedValues;
 use Symfony\Component\Finder\SplFileInfo;
 
 class Entity implements ArrayAccess
@@ -22,6 +23,9 @@ class Entity implements ArrayAccess
      */
     private $basePath;
 
+    /**
+     * @return self
+     */
     public static function make(SplFileInfo $classPath, ClassDefinition $definition, $base): self
     {
         $object = new self;
@@ -32,17 +36,17 @@ class Entity implements ArrayAccess
         return $object;
     }
 
-    public function getRelativePath()
+    public function getRelativePath(): string
     {
-        return $this->classPath->getRelativePath();
+        return trim(str_replace($this->basePath, '', $this->classPath->getRealPath()), '/\\');
     }
 
-    public function getFileName()
+    public function getFileName(): string
     {
         return $this->classPath->getFilename();
     }
 
-    public function getRelativePathname()
+    public function getRelativePathname(): string
     {
         return $this->classPath->getRelativePathname();
     }
@@ -52,16 +56,40 @@ class Entity implements ArrayAccess
         return $this->classDefinition;
     }
 
+    public function getEntityName(): string
+    {
+        return $this->classDefinition->getEntityName();
+    }
+
+    public function getAbsolutePath(): string
+    {
+        return $this->classPath->getRealPath();
+    }
+
+    public function getNamespace(): ?string
+    {
+        return $this->classDefinition->getNamespace();
+    }
+
+    #[ExpectedValues(['interface', 'class', 'enum', 'trait', null])]
+    public function getType()
+    {
+        return $this->classDefinition->getType();
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
     public function toArray()
     {
         return [
-            'relativePath' => trim(str_replace($this->basePath, '', $this->classPath->getRealPath()), '/\\'),
+            'relativePath' => $this->getRelativePath(),
             'relativePathname' => $this->classPath->getRelativePathname(),
             'fileName' => $this->classPath->getFilename(),
-            'currentNamespace' => $this->classDefinition->getNamespace(),
+            'currentNamespace' => $this->getNamespace(),
             'absFilePath' => $this->classPath->getRealPath(),
             'class' => $this->classDefinition->getEntityName(),
-            'type' => $this->classDefinition->getType(),
+            'type' => $this->getType(),
         ];
     }
 

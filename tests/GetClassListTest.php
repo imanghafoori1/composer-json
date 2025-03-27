@@ -9,6 +9,9 @@ class GetClassListTest extends TestCase
 {
     public function test_getClasslists()
     {
+        if (version_compare(phpversion(), '8.0.0', '<')) {
+            $this->markTestSkipped('php version >= 8.0.0');
+        }
         $d = DIRECTORY_SEPARATOR;
         $reader = ComposerJson::make($p = __DIR__.$d.'Stubs'.$d.'a3');
         $classList = $reader->getClasslists(null, null)->getAllLists();
@@ -109,7 +112,7 @@ class GetClassListTest extends TestCase
         ], $errors1->entity->toArray());
 
         $this->assertEquals('filename', $errors1->errorType());
-        $this->assertEquals('C', $errors1->filename);
+        $this->assertEquals('C.php', $errors1->filename);
 
         /**
          * @var $errors1 \ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError
@@ -150,9 +153,9 @@ class GetClassListTest extends TestCase
          */
         $errors1 = $errors['/'][3];
         $this->assertEquals([
-            'absFilePath' => 'E:\__coding__\my_github_repos\composer-json\tests\Stubs\a3\app\x\enum.php',
-            'relativePath' => 'app\x\enum.php',
-            'relativePathname' => 'x\enum.php',
+            'absFilePath' => __DIR__."{$d}Stubs{$d}a3{$d}app{$d}x{$d}enum.php",
+            'relativePath' => "app{$d}x{$d}enum.php",
+            'relativePathname' => "x{$d}enum.php",
             'fileName' => 'enum.php',
             'currentNamespace' => 'App\x',
             'class' => 'myEnum',
@@ -160,6 +163,6 @@ class GetClassListTest extends TestCase
         ], $errors1->entity->toArray());
 
         $this->assertEquals('filename', $errors1->errorType());
-        $this->assertEquals('myEnum', $errors1->filename);
+        $this->assertEquals('myEnum.php', $errors1->filename);
     }
 }
