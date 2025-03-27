@@ -28,7 +28,7 @@ class Entity implements ArrayAccess
      */
     public static function make(SplFileInfo $classPath, ClassDefinition $definition, $base): self
     {
-        $object = new self;
+        $object = new self();
         $object->classPath = $classPath;
         $object->classDefinition = $definition;
         $object->basePath = $base;

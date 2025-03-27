@@ -12,7 +12,7 @@ class GetClassProperties
         $tokens = token_get_all($buffer.'/**/');
 
         if (strpos($buffer, '{') === false || ($tokens[0][0] ?? null) !== T_OPEN_TAG) {
-            return new ClassDefinition;
+            return new ClassDefinition();
         }
 
         return self::readClassDefinition($tokens);
