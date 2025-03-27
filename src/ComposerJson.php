@@ -26,10 +26,9 @@ class ComposerJson
     public $additionalComposerJsons = [];
 
     /**
-     * @param $folderPath
-     * @param $ignoredNamespaces
-     * @param $composers
-     *
+     * @param  $folderPath
+     * @param  $ignoredNamespaces
+     * @param  $composers
      * @return static
      */
     public static function make($folderPath, $ignoredNamespaces = [], $composers = [])
@@ -80,7 +79,7 @@ class ComposerJson
     }
 
     /**
-     * @param bool $purgeShortcuts
+     * @param  bool  $purgeShortcuts
      * @return array<string, array>
      */
     public function readAutoloadPsr4($purgeShortcuts = false)
@@ -89,7 +88,7 @@ class ComposerJson
     }
 
     /**
-     * @param bool $purgeShortcuts
+     * @param  bool  $purgeShortcuts
      * @return array<string, array>
      */
     public function readAutoload($purgeShortcuts = false)
@@ -127,7 +126,7 @@ class ComposerJson
     }
 
     /**
-     * @param $basePath
+     * @param  $basePath
      * @return string[]
      */
     public function autoloadedFilesList($basePath)
@@ -229,10 +228,9 @@ class ComposerJson
     }
 
     /**
-     * @param string $composerPath
-     * @param \Closure $filterClass
-     * @param \Closure|null $pathFilter
-     *
+     * @param  string  $composerPath
+     * @param  \Closure  $filterClass
+     * @param  \Closure|null  $pathFilter
      * @return \ImanGhafoori\ComposerJson\Entity[]
      */
     public function getClassesWithin(string $composerPath, Closure $filterClass, ?Closure $pathFilter = null)
@@ -297,8 +295,8 @@ class ComposerJson
     }
 
     /**
-     * @param array<string, array<string, \ImanGhafoori\ComposerJson\Entity[]>> $classLists
-     * @param \Closure|null $onCheck
+     * @param  array<string, array<string, \ImanGhafoori\ComposerJson\Entity[]>>  $classLists
+     * @param  \Closure|null  $onCheck
      * @return array<string, array>
      */
     public function getErrorsLists(array $classLists, ?Closure $onCheck)
@@ -313,7 +311,7 @@ class ComposerJson
     }
 
     /**
-     * @param string $namespace
+     * @param  string  $namespace
      * @return string
      */
     public function getRelativePathFromNamespace($namespace)
@@ -334,8 +332,7 @@ class ComposerJson
     }
 
     /**
-     * @param string $absPath
-     *
+     * @param  string  $absPath
      * @return string
      */
     public function getNamespacedClassFromPath($absPath)
@@ -362,7 +359,6 @@ class ComposerJson
      * get all ".php" files in directory by giving a path.
      *
      * @param  string  $path  Directory path
-     *
      * @return \Symfony\Component\Finder\Finder|array
      */
     public function getAllPhpFiles($path, $basePath = '')

@@ -32,15 +32,14 @@ class ClassDefinition
     private $entityName = null;
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param string $interfaces
-     * @param string|null $namespace
-     * @param string|null $parent
-     *
+     * @param  string  $name
+     * @param  int  $type
+     * @param  string  $interfaces
+     * @param  string|null  $namespace
+     * @param  string|null  $parent
      * @return self
      */
-    public static function make(string $name, int $type, string $interfaces, $namespace = null, string $parent = null): self
+    public static function make(string $name, int $type, string $interfaces, $namespace = null, ?string $parent = null): self
     {
         $self = new self();
         $self->entityName = $name;

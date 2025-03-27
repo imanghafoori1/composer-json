@@ -10,10 +10,9 @@ class ClassLists
     private $classLists = [];
 
     /**
-     * @param string $composerFilePath
-     * @param string $namespace
-     * @param \ImanGhafoori\ComposerJson\Entity[] $classList
-     *
+     * @param  string  $composerFilePath
+     * @param  string  $namespace
+     * @param  \ImanGhafoori\ComposerJson\Entity[]  $classList
      * @return void
      */
     public function addList($composerFilePath, $namespace, array $classList)
@@ -30,7 +29,7 @@ class ClassLists
     }
 
     /**
-     * @param \Closure $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function foreachEntity($callback)
