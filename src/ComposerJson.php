@@ -20,8 +20,18 @@ class ComposerJson
 
     public $ignoredNamespaces = [];
 
+    /**
+     * @var array<string, string>
+     */
     public $additionalComposerJsons = [];
 
+    /**
+     * @param $folderPath
+     * @param $ignoredNamespaces
+     * @param $composers
+     *
+     * @return static
+     */
     public static function make($folderPath, $ignoredNamespaces = [], $composers = [])
     {
         $folderPath = rtrim($folderPath, '/\\ ');
@@ -69,11 +79,19 @@ class ComposerJson
         return $result;
     }
 
+    /**
+     * @param bool $purgeShortcuts
+     * @return array<string, array>
+     */
     public function readAutoloadPsr4($purgeShortcuts = false)
     {
         return $this->readAutoload($purgeShortcuts);
     }
 
+    /**
+     * @param bool $purgeShortcuts
+     * @return array<string, array>
+     */
     public function readAutoload($purgeShortcuts = false)
     {
         $result = [];
@@ -91,6 +109,9 @@ class ComposerJson
         return self::removedIgnored($results, $this->ignoredNamespaces);
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function readAutoloadFiles()
     {
         $result = [];
@@ -106,7 +127,7 @@ class ComposerJson
     }
 
     /**
-     * @param  $basePath
+     * @param $basePath
      * @return string[]
      */
     public function autoloadedFilesList($basePath)
@@ -122,6 +143,9 @@ class ComposerJson
         return $absoluteFilePaths;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function collectLocalRepos()
     {
         $composers = [];
@@ -181,6 +205,9 @@ class ComposerJson
         return $this->result[$absPath];
     }
 
+    /**
+     * @return \ImanGhafoori\ComposerJson\ClassLists
+     */
     public function getClasslists(?Closure $filter, ?Closure $pathFilter)
     {
         $filter = $filter ?: function () {
@@ -201,7 +228,14 @@ class ComposerJson
         return $classLists;
     }
 
-    public function getClassesWithin($composerPath, Closure $filterClass, ?Closure $pathFilter = null)
+    /**
+     * @param string $composerPath
+     * @param \Closure $filterClass
+     * @param \Closure|null $pathFilter
+     *
+     * @return \ImanGhafoori\ComposerJson\Entity[]
+     */
+    public function getClassesWithin(string $composerPath, Closure $filterClass, ?Closure $pathFilter = null)
     {
         /**
          * @var $results array<int, \ImanGhafoori\ComposerJson\Entity>
@@ -262,17 +296,26 @@ class ComposerJson
         return $autoloads;
     }
 
+    /**
+     * @param array<string, array<string, \ImanGhafoori\ComposerJson\Entity[]>> $classLists
+     * @param \Closure|null $onCheck
+     * @return array<string, array>
+     */
     public function getErrorsLists(array $classLists, ?Closure $onCheck)
     {
         $errorsLists = [];
         $autoloads = $this->readAutoload();
         foreach ($classLists as $composerPath => $classList) {
-            $errorsLists[$composerPath] = NamespaceCalculator::findPsr4Errors($this->basePath, $autoloads[$composerPath], $classList, $onCheck);
+            $errorsLists[$composerPath] = NamespaceCalculator::findPsr4Errors($autoloads[$composerPath], $classList, $onCheck);
         }
 
         return $errorsLists;
     }
 
+    /**
+     * @param string $namespace
+     * @return string
+     */
     public function getRelativePathFromNamespace($namespace)
     {
         $autoload = $this->readAutoload();
@@ -290,6 +333,11 @@ class ComposerJson
         return \str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
     }
 
+    /**
+     * @param string $absPath
+     *
+     * @return string
+     */
     public function getNamespacedClassFromPath($absPath)
     {
         $psr4Mappings = $this->readAutoload();
@@ -314,6 +362,7 @@ class ComposerJson
      * get all ".php" files in directory by giving a path.
      *
      * @param  string  $path  Directory path
+     *
      * @return \Symfony\Component\Finder\Finder|array
      */
     public function getAllPhpFiles($path, $basePath = '')
@@ -344,6 +393,9 @@ class ComposerJson
         return $definition;
     }
 
+    /**
+     * @return bool
+     */
     private static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {

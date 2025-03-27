@@ -6,16 +6,40 @@ use JetBrains\PhpStorm\ExpectedValues;
 
 class ClassDefinition
 {
+    /**
+     * @var int|null
+     */
     private $type = null;
 
+    /**
+     * @var string[]
+     */
     private $interfaces = [];
 
+    /**
+     * @var string|null
+     */
     private $parent = null;
 
+    /**
+     * @var string|null
+     */
     private $namespace = null;
 
+    /**
+     * @var string|null
+     */
     private $entityName = null;
 
+    /**
+     * @param string $name
+     * @param int $type
+     * @param string $interfaces
+     * @param string|null $namespace
+     * @param string|null $parent
+     *
+     * @return self
+     */
     public static function make(string $name, int $type, string $interfaces, $namespace = null, string $parent = null): self
     {
         $self = new self;
@@ -64,7 +88,7 @@ class ClassDefinition
         return $this->namespace;
     }
 
-    public function getEntityName()
+    public function getEntityName(): ?string
     {
         return $this->entityName;
     }

@@ -18,7 +18,7 @@ class GetClassProperties
         return self::readClassDefinition($tokens);
     }
 
-    public static function readClassDefinition($tokens): ClassDefinition
+    public static function readClassDefinition(array $tokens): ClassDefinition
     {
         ! defined('T_ENUM') && define('T_ENUM', -1654);
         $type = $class = null;
