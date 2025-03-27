@@ -63,6 +63,7 @@ class GetClassProperties
         if ($class === null) {
             dd($tokens);
         }
+
         return ClassDefinition::make($class, $type, $interfaces, $namespace, $parent);
     }
 
