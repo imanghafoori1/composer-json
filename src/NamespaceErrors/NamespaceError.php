@@ -24,6 +24,9 @@ class NamespaceError
         $this->entity = $entity;
     }
 
+    /**
+     * @return string
+     */
     public function getShortest()
     {
         return NamespaceCalculator::findShortest($this->correctNamespaces);
