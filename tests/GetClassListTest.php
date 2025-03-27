@@ -109,7 +109,7 @@ class GetClassListTest extends TestCase
         ], $errors1->entity->toArray());
 
         $this->assertEquals('filename', $errors1->errorType());
-        $this->assertEquals('C', $errors1->filename);
+        $this->assertEquals('C.php', $errors1->filename);
 
         /**
          * @var $errors1 \ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError
@@ -160,6 +160,6 @@ class GetClassListTest extends TestCase
         ], $errors1->entity->toArray());
 
         $this->assertEquals('filename', $errors1->errorType());
-        $this->assertEquals('myEnum', $errors1->filename);
+        $this->assertEquals('myEnum.php', $errors1->filename);
     }
 }

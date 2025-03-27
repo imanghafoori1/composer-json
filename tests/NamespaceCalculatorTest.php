@@ -94,7 +94,7 @@ class NamespaceCalculatorTest extends TestCase
         $this->assertEquals([
             'type' => 'namespace',
             'correctNamespace' => 'Models',
-        ], [
+        ],[
             'type' => $result->errorType(),
             'correctNamespace' => $result->getShortest(),
         ]);
