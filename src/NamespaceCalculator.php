@@ -38,7 +38,7 @@ class NamespaceCalculator
     /**
      * @param  $psr4Mapping
      * @param  array<string, array<int, \ImanGhafoori\ComposerJson\Entity>>  $classLists
-     * @param \Closure|null $onCheck
+     * @param  \Closure|null  $onCheck
      * @return array<int, \ImanGhafoori\ComposerJson\NamespaceErrors\FilenameError|\ImanGhafoori\ComposerJson\NamespaceErrors\NamespaceError>
      */
     public static function findPsr4Errors($psr4Mapping, $classLists, ?Closure $onCheck)
@@ -74,7 +74,7 @@ class NamespaceCalculator
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
      * @return string
      */
     public static function getNamespaceFromFullClass($class)
@@ -86,8 +86,8 @@ class NamespaceCalculator
     }
 
     /**
-     * @param string $class1
-     * @param string $class2
+     * @param  string  $class1
+     * @param  string  $class2
      * @return bool
      */
     public static function haveSameNamespace($class1, $class2)
@@ -96,7 +96,7 @@ class NamespaceCalculator
     }
 
     /**
-     * @param string[] $correctNamespaces
+     * @param  string[]  $correctNamespaces
      * @return string
      */
     public static function findShortest($correctNamespaces)
@@ -108,9 +108,8 @@ class NamespaceCalculator
     }
 
     /**
-     * @param $psr4Mapping
-     * @param $relativePath
-     *
+     * @param  $psr4Mapping
+     * @param  $relativePath
      * @return string[]
      */
     public static function getCorrectNamespaces($psr4Mapping, $relativePath)
