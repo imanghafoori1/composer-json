@@ -21,10 +21,10 @@ class GetClassProperties
     public static function readClassDefinition(array $tokens)
     {
         ! defined('T_ENUM') && define('T_ENUM', -1654);
-        $type = $class = null;
+        $type = 0;
         $allTokensCount = count($tokens);
         $parent = null;
-        $interfaces = $namespace = '';
+        $class = $interfaces = $namespace = '';
 
         for ($i = 1; $i < $allTokensCount; $i++) {
             if (! $namespace) {
@@ -43,7 +43,7 @@ class GetClassProperties
                 if ($tokens[$i - 2][0] !== T_NEW && ($tokens[$i + 2][0] ?? null) === T_STRING && isset($tokens[$i + 4])) {
                     $class = $tokens[$i + 2][1];
                 } else {
-                    $class = null;
+                    $class = '';
                 }
 
                 $type = $tokens[$i][0];
