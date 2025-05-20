@@ -34,11 +34,11 @@ class GetClassProperties
             // if we reach a double colon before a class keyword
             // it means that, it is not a psr-4 class.
             if (! $class && $tokens[$i][0] == T_DOUBLE_COLON) {
-                return [$namespace, null, null, null, null];
+                return new ClassDefinition;
             }
 
             // when we reach the first "class", or "interface" or "trait" keyword
-            if (! $class && \in_array($tokens[$i][0], [T_CLASS, T_INTERFACE, T_TRAIT, T_ENUM])) {
+            if (! $class && in_array($tokens[$i][0], [T_CLASS, T_INTERFACE, T_TRAIT, T_ENUM])) {
                 // anonymous class: new class() {...}
                 if ($tokens[$i - 2][0] !== T_NEW && ($tokens[$i + 2][0] ?? null) === T_STRING && isset($tokens[$i + 4])) {
                     $class = $tokens[$i + 2][1];
