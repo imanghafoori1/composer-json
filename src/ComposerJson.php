@@ -106,7 +106,7 @@ class ComposerJson
     }
 
     /**
-     * @param $basePath
+     * @param  $basePath
      * @return string[]
      */
     public function autoloadedFilesList($basePath)
