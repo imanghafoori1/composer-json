@@ -83,9 +83,8 @@ class NamespaceCalculator
     }
 
     /**
-     * @param $psr4Mapping
-     * @param $relativePath
-     *
+     * @param  $psr4Mapping
+     * @param  $relativePath
      * @return string[]
      */
     public static function getCorrectNamespaces($psr4Mapping, $relativePath)
