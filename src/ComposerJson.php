@@ -186,7 +186,7 @@ class ComposerJson
         $filter = $filter ?: function () {
             return true;
         };
-        $classLists = new ClassLists;
+        $classLists = new ClassLists();
 
         foreach ($this->readAutoload(true) as $composerFilePath => $autoload) {
             foreach ($autoload as $namespace => $psr4Paths) {

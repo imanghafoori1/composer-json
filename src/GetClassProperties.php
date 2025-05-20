@@ -12,7 +12,7 @@ class GetClassProperties
         $tokens = token_get_all($buffer.'/**/');
 
         if (strpos($buffer, '{') === false || ($tokens[0][0] ?? null) !== T_OPEN_TAG) {
-            return new ClassDefinition;
+            return new ClassDefinition();
         }
 
         return self::readClassDefinition($tokens);
@@ -34,7 +34,7 @@ class GetClassProperties
             // if we reach a double colon before a class keyword
             // it means that, it is not a psr-4 class.
             if (! $class && $tokens[$i][0] == T_DOUBLE_COLON) {
-                return new ClassDefinition;
+                return new ClassDefinition();
             }
 
             // when we reach the first "class", or "interface" or "trait" keyword
